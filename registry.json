@@ -1,12 +1,12 @@
 {
     "schema": 1,
-    "generated_at": "2026-08-26T07:40:00Z",
+    "generated_at": "2026-08-26T08:25:05Z",
     "modules": [
         {
             "name": "Announcement",
             "alias": "announcement",
             "composer_package": "koakademy/announcement",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "description": "School-wide announcements for administrators and portal users.",
             "author": "KoAkademy contributors",
             "license": "AGPL-3.0-or-later",
@@ -26,6 +26,16 @@
             "homepage": "https://github.com/yukazakiri/koakademy-module-announcement",
             "versions": [
                 {
+                    "version": "1.0.1",
+                    "asset_url": "https://github.com/yukazakiri/koakademy-module-announcement/archive/refs/tags/v1.0.1.zip",
+                    "sha256": "0d799c1a82ec80a3be1253a030994a1b9c2cb1f17cea596173fb56531a0e5bf6",
+                    "released_at": "2026-08-26T08:28:30Z",
+                    "requires": {
+                        "core": ">=1.20.0",
+                        "php": ">=8.5"
+                    }
+                },
+                {
                     "version": "1.0.0",
                     "asset_url": "https://github.com/yukazakiri/koakademy-module-announcement/archive/refs/tags/v1.0.0.zip",
                     "sha256": "738b426b2e3de466e47bcced780f459d513c8d5e66fb6e3d8eb0bd925dba2bfb",
@@ -41,7 +51,7 @@
             "name": "Cashier",
             "alias": "cashier",
             "composer_package": "koakademy/cashier",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "description": "Cashier workflows for student balance lookup and payment posting.",
             "author": "KoAkademy contributors",
             "license": "AGPL-3.0-or-later",
@@ -61,6 +71,16 @@
             "homepage": "https://github.com/yukazakiri/koakademy-module-cashier",
             "versions": [
                 {
+                    "version": "1.0.1",
+                    "asset_url": "https://github.com/yukazakiri/koakademy-module-cashier/archive/refs/tags/v1.0.1.zip",
+                    "sha256": "031c9620a6b2c367347c102ab67403b7f439b24831ff5aa9668e6da4f112fd2b",
+                    "released_at": "2026-08-26T08:28:35Z",
+                    "requires": {
+                        "core": ">=1.20.0",
+                        "php": ">=8.5"
+                    }
+                },
+                {
                     "version": "1.0.0",
                     "asset_url": "https://github.com/yukazakiri/koakademy-module-cashier/archive/refs/tags/v1.0.0.zip",
                     "sha256": "8a45c65d388b7573e10244dfd36d8405e9c7b9d777698f3cbedca0ca2f59e00c",
@@ -76,7 +96,7 @@
             "name": "Inventory",
             "alias": "inventory",
             "composer_package": "koakademy/inventory",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "description": "Property and inventory management for products, suppliers, stock, and borrowings.",
             "author": "KoAkademy contributors",
             "license": "AGPL-3.0-or-later",
@@ -96,6 +116,16 @@
             "homepage": "https://github.com/yukazakiri/koakademy-module-inventory",
             "versions": [
                 {
+                    "version": "1.0.1",
+                    "asset_url": "https://github.com/yukazakiri/koakademy-module-inventory/archive/refs/tags/v1.0.1.zip",
+                    "sha256": "7e395414c47687c66f9fc90dcfee81efbcb8cb8d0192e0f58a781837cb507c28",
+                    "released_at": "2026-08-26T08:28:39Z",
+                    "requires": {
+                        "core": ">=1.20.0",
+                        "php": ">=8.5"
+                    }
+                },
+                {
                     "version": "1.0.0",
                     "asset_url": "https://github.com/yukazakiri/koakademy-module-inventory/archive/refs/tags/v1.0.0.zip",
                     "sha256": "9f3560e16b45ad42b55e3ff3064a62fb8a6f20eb6d856ac676ef15433e2f150b",
@@ -111,7 +141,7 @@
             "name": "LibrarySystem",
             "alias": "library-system",
             "composer_package": "koakademy/library-system",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "description": "Library catalogue, borrowing, research papers, and rights-cleared digital editions.",
             "author": "KoAkademy contributors",
             "license": "AGPL-3.0-or-later",
@@ -131,6 +161,16 @@
             "homepage": "https://github.com/yukazakiri/koakademy-module-library-system",
             "versions": [
                 {
+                    "version": "1.0.1",
+                    "asset_url": "https://github.com/yukazakiri/koakademy-module-library-system/archive/refs/tags/v1.0.1.zip",
+                    "sha256": "4e89f167719bd23df243e881a735adb9314f72e232e82f2273297aeb50e4d620",
+                    "released_at": "2026-08-26T08:28:44Z",
+                    "requires": {
+                        "core": ">=1.20.0",
+                        "php": ">=8.5"
+                    }
+                },
+                {
                     "version": "1.0.0",
                     "asset_url": "https://github.com/yukazakiri/koakademy-module-library-system/archive/refs/tags/v1.0.0.zip",
                     "sha256": "7d58a9cfcd8e44dc21bce84178d44fd1e347d46a9d9537da2816010cce286a3a",
@@ -146,7 +186,7 @@
             "name": "NotificationCenter",
             "alias": "notification-center",
             "composer_package": "koakademy/notification-center",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "description": "Template-based notification management and bulk messaging tools.",
             "author": "KoAkademy contributors",
             "license": "AGPL-3.0-or-later",
@@ -166,6 +206,16 @@
             "homepage": "https://github.com/yukazakiri/koakademy-module-notification-center",
             "versions": [
                 {
+                    "version": "1.0.1",
+                    "asset_url": "https://github.com/yukazakiri/koakademy-module-notification-center/archive/refs/tags/v1.0.1.zip",
+                    "sha256": "61bcb9b159e953c027324b995b3a8c380f89c71d1f3242d34b32ae4f47f7c9fa",
+                    "released_at": "2026-08-26T08:28:48Z",
+                    "requires": {
+                        "core": ">=1.20.0",
+                        "php": ">=8.5"
+                    }
+                },
+                {
                     "version": "1.0.0",
                     "asset_url": "https://github.com/yukazakiri/koakademy-module-notification-center/archive/refs/tags/v1.0.0.zip",
                     "sha256": "9898b712c486dfdabf382e930556483b390caba75d92c90e1663e8a193bace06",
@@ -181,7 +231,7 @@
             "name": "StudentMedicalRecords",
             "alias": "student-medical-records",
             "composer_package": "koakademy/student-medical-records",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "description": "Confidential student medical records, clinic visits, and reporting tools.",
             "author": "KoAkademy contributors",
             "license": "AGPL-3.0-or-later",
@@ -201,6 +251,16 @@
             "homepage": "https://github.com/yukazakiri/koakademy-module-student-medical-records",
             "versions": [
                 {
+                    "version": "1.0.1",
+                    "asset_url": "https://github.com/yukazakiri/koakademy-module-student-medical-records/archive/refs/tags/v1.0.1.zip",
+                    "sha256": "3ae1a5186eaa4d16df50602548fa3c880cb50a84aa735aaa6d31f2eeac24da15",
+                    "released_at": "2026-08-26T08:28:53Z",
+                    "requires": {
+                        "core": ">=1.20.0",
+                        "php": ">=8.5"
+                    }
+                },
+                {
                     "version": "1.0.0",
                     "asset_url": "https://github.com/yukazakiri/koakademy-module-student-medical-records/archive/refs/tags/v1.0.0.zip",
                     "sha256": "1a29b92fae68b616db75ba1d09428b5bc9357995d1940610eb6f02882c5e72ea",
@@ -215,6 +275,6 @@
     ],
     "signature": {
         "algorithm": "ed25519",
-        "value": "gy-xA0jIpAM6YfvOAe4PvRTwGS5ppfWfiLOdoETNe6-igbnx8E7EkTcDiEGNVb6_MSuirIIEFPt1cgQkbTUuDA"
+        "value": "3XyMvGw_ZyyevRdBex_A03OY7yasZDQ2yNfqCymbx_UrVRk80tywLXWqeOMfL3EkTgmYUBo6NA0KV0QAvUM-CA"
     }
 }
