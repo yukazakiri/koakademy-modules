@@ -1,0 +1,220 @@
+{
+    "schema": 1,
+    "generated_at": "2026-08-26T07:40:00Z",
+    "modules": [
+        {
+            "name": "Announcement",
+            "alias": "announcement",
+            "composer_package": "koakademy/announcement",
+            "version": "1.0.0",
+            "description": "School-wide announcements for administrators and portal users.",
+            "author": "KoAkademy contributors",
+            "license": "AGPL-3.0-or-later",
+            "requires": {
+                "core": ">=1.20.0",
+                "php": ">=8.5",
+                "modules": []
+            },
+            "compatibility": {
+                "laravel": "^13.0",
+                "filament": "^5.0"
+            },
+            "providers": [
+                "Modules\\Announcement\\Providers\\AnnouncementServiceProvider"
+            ],
+            "repository": "https://github.com/yukazakiri/koakademy-module-announcement",
+            "homepage": "https://github.com/yukazakiri/koakademy-module-announcement",
+            "versions": [
+                {
+                    "version": "1.0.0",
+                    "asset_url": "https://github.com/yukazakiri/koakademy-module-announcement/archive/refs/tags/v1.0.0.zip",
+                    "sha256": "738b426b2e3de466e47bcced780f459d513c8d5e66fb6e3d8eb0bd925dba2bfb",
+                    "released_at": "2026-08-26T07:23:04Z",
+                    "requires": {
+                        "core": ">=1.20.0",
+                        "php": ">=8.5"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Cashier",
+            "alias": "cashier",
+            "composer_package": "koakademy/cashier",
+            "version": "1.0.0",
+            "description": "Cashier workflows for student balance lookup and payment posting.",
+            "author": "KoAkademy contributors",
+            "license": "AGPL-3.0-or-later",
+            "requires": {
+                "core": ">=1.20.0",
+                "php": ">=8.5",
+                "modules": []
+            },
+            "compatibility": {
+                "laravel": "^13.0",
+                "filament": "^5.0"
+            },
+            "providers": [
+                "Modules\\Cashier\\Providers\\CashierServiceProvider"
+            ],
+            "repository": "https://github.com/yukazakiri/koakademy-module-cashier",
+            "homepage": "https://github.com/yukazakiri/koakademy-module-cashier",
+            "versions": [
+                {
+                    "version": "1.0.0",
+                    "asset_url": "https://github.com/yukazakiri/koakademy-module-cashier/archive/refs/tags/v1.0.0.zip",
+                    "sha256": "8a45c65d388b7573e10244dfd36d8405e9c7b9d777698f3cbedca0ca2f59e00c",
+                    "released_at": "2026-08-26T07:25:00Z",
+                    "requires": {
+                        "core": ">=1.20.0",
+                        "php": ">=8.5"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Inventory",
+            "alias": "inventory",
+            "composer_package": "koakademy/inventory",
+            "version": "1.0.0",
+            "description": "Property and inventory management for products, suppliers, stock, and borrowings.",
+            "author": "KoAkademy contributors",
+            "license": "AGPL-3.0-or-later",
+            "requires": {
+                "core": ">=1.20.0",
+                "php": ">=8.5",
+                "modules": []
+            },
+            "compatibility": {
+                "laravel": "^13.0",
+                "filament": "^5.0"
+            },
+            "providers": [
+                "Modules\\Inventory\\Providers\\InventoryServiceProvider"
+            ],
+            "repository": "https://github.com/yukazakiri/koakademy-module-inventory",
+            "homepage": "https://github.com/yukazakiri/koakademy-module-inventory",
+            "versions": [
+                {
+                    "version": "1.0.0",
+                    "asset_url": "https://github.com/yukazakiri/koakademy-module-inventory/archive/refs/tags/v1.0.0.zip",
+                    "sha256": "9f3560e16b45ad42b55e3ff3064a62fb8a6f20eb6d856ac676ef15433e2f150b",
+                    "released_at": "2026-08-26T07:26:00Z",
+                    "requires": {
+                        "core": ">=1.20.0",
+                        "php": ">=8.5"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "LibrarySystem",
+            "alias": "library-system",
+            "composer_package": "koakademy/library-system",
+            "version": "1.0.0",
+            "description": "Library catalogue, borrowing, research papers, and rights-cleared digital editions.",
+            "author": "KoAkademy contributors",
+            "license": "AGPL-3.0-or-later",
+            "requires": {
+                "core": ">=1.20.0",
+                "php": ">=8.5",
+                "modules": []
+            },
+            "compatibility": {
+                "laravel": "^13.0",
+                "filament": "^5.0"
+            },
+            "providers": [
+                "Modules\\LibrarySystem\\Providers\\LibrarySystemServiceProvider"
+            ],
+            "repository": "https://github.com/yukazakiri/koakademy-module-library-system",
+            "homepage": "https://github.com/yukazakiri/koakademy-module-library-system",
+            "versions": [
+                {
+                    "version": "1.0.0",
+                    "asset_url": "https://github.com/yukazakiri/koakademy-module-library-system/archive/refs/tags/v1.0.0.zip",
+                    "sha256": "7d58a9cfcd8e44dc21bce84178d44fd1e347d46a9d9537da2816010cce286a3a",
+                    "released_at": "2026-08-26T07:27:00Z",
+                    "requires": {
+                        "core": ">=1.20.0",
+                        "php": ">=8.5"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "NotificationCenter",
+            "alias": "notification-center",
+            "composer_package": "koakademy/notification-center",
+            "version": "1.0.0",
+            "description": "Template-based notification management and bulk messaging tools.",
+            "author": "KoAkademy contributors",
+            "license": "AGPL-3.0-or-later",
+            "requires": {
+                "core": ">=1.20.0",
+                "php": ">=8.5",
+                "modules": []
+            },
+            "compatibility": {
+                "laravel": "^13.0",
+                "filament": "^5.0"
+            },
+            "providers": [
+                "Modules\\NotificationCenter\\Providers\\NotificationCenterServiceProvider"
+            ],
+            "repository": "https://github.com/yukazakiri/koakademy-module-notification-center",
+            "homepage": "https://github.com/yukazakiri/koakademy-module-notification-center",
+            "versions": [
+                {
+                    "version": "1.0.0",
+                    "asset_url": "https://github.com/yukazakiri/koakademy-module-notification-center/archive/refs/tags/v1.0.0.zip",
+                    "sha256": "9898b712c486dfdabf382e930556483b390caba75d92c90e1663e8a193bace06",
+                    "released_at": "2026-08-26T07:23:34Z",
+                    "requires": {
+                        "core": ">=1.20.0",
+                        "php": ">=8.5"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "StudentMedicalRecords",
+            "alias": "student-medical-records",
+            "composer_package": "koakademy/student-medical-records",
+            "version": "1.0.0",
+            "description": "Confidential student medical records, clinic visits, and reporting tools.",
+            "author": "KoAkademy contributors",
+            "license": "AGPL-3.0-or-later",
+            "requires": {
+                "core": ">=1.20.0",
+                "php": ">=8.5",
+                "modules": []
+            },
+            "compatibility": {
+                "laravel": "^13.0",
+                "filament": "^5.0"
+            },
+            "providers": [
+                "Modules\\StudentMedicalRecords\\Providers\\StudentMedicalRecordsServiceProvider"
+            ],
+            "repository": "https://github.com/yukazakiri/koakademy-module-student-medical-records",
+            "homepage": "https://github.com/yukazakiri/koakademy-module-student-medical-records",
+            "versions": [
+                {
+                    "version": "1.0.0",
+                    "asset_url": "https://github.com/yukazakiri/koakademy-module-student-medical-records/archive/refs/tags/v1.0.0.zip",
+                    "sha256": "1a29b92fae68b616db75ba1d09428b5bc9357995d1940610eb6f02882c5e72ea",
+                    "released_at": "2026-08-26T07:30:00Z",
+                    "requires": {
+                        "core": ">=1.20.0",
+                        "php": ">=8.5"
+                    }
+                }
+            ]
+        }
+    ],
+    "signature": {
+        "algorithm": "ed25519",
+        "value": "gy-xA0jIpAM6YfvOAe4PvRTwGS5ppfWfiLOdoETNe6-igbnx8E7EkTcDiEGNVb6_MSuirIIEFPt1cgQkbTUuDA"
+    }
+}

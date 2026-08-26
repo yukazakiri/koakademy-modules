@@ -1,0 +1,4 @@
+/keys/
+/public/
+/.env
+*.local.json

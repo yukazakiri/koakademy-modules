@@ -1,0 +1,9 @@
+{
+    "name": "koakademy/modules-registry",
+    "description": "Signed Composer and module catalog for KoAkademy packages.",
+    "type": "project",
+    "license": "AGPL-3.0-or-later",
+    "require": {
+        "php": ">=8.5 <8.6"
+    }
+}
