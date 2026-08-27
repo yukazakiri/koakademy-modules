@@ -23,19 +23,16 @@ application image.
 2. Update `module.json` to the new semver version and update migrations,
    permissions, compatibility requirements, and changelog information.
 3. Create and push the matching tag, for example `v1.2.3`.
-4. In the registry checkout, download the exact GitHub tag archive and run:
+4. The registry rebuild workflow detects the new tag automatically, either on
+   its daily schedule or via a `module-released` dispatch from the module
+   repository. No manual metadata edit is required; `scripts/rebuild-registry.php`
+   downloads the tag, recalculates checksums, and normalizes the manifest
+   version to the tag.
 
-   ```sh
-   php scripts/update-module.php \
-       --module=/path/to/module \
-       --archive=/path/to/v1.2.3.zip
-   php scripts/validate-registry.php
-   ```
-
-5. Open a registry pull request. The updater removes the previous signature so
-   the pull request cannot accidentally claim that an unsigned edit is signed.
-6. After review, a maintainer signs the catalog with the existing persistent
-   Ed25519 private key and verifies it:
+5. If the `REGISTRY_PRIVATE_KEY` secret is configured, the workflow signs the
+   catalog and pushes to `master`. Otherwise it opens a pull request; a
+   maintainer signs the catalog with the persistent Ed25519 private key and
+   verifies it:
 
    ```sh
    php scripts/sign-registry.php registry.json /secure/registry-private.key registry.json
@@ -43,7 +40,7 @@ application image.
    php scripts/verify-registry.php
    ```
 
-7. Merge to `master`. Registry CI and the Pages workflow validate the signed
+6. Merge to `master`. Registry CI and the Pages workflow validate the signed
    files before the public catalog is published.
 
 ## Installing or updating it in KoAkademy

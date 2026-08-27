@@ -1,0 +1,26 @@
+{
+    "schema": 1,
+    "modules": [
+        {
+            "repository": "https://github.com/yukazakiri/koakademy-module-announcement"
+        },
+        {
+            "repository": "https://github.com/yukazakiri/koakademy-module-cashier"
+        },
+        {
+            "repository": "https://github.com/yukazakiri/koakademy-module-forms"
+        },
+        {
+            "repository": "https://github.com/yukazakiri/koakademy-module-inventory"
+        },
+        {
+            "repository": "https://github.com/yukazakiri/koakademy-module-library-system"
+        },
+        {
+            "repository": "https://github.com/yukazakiri/koakademy-module-notification-center"
+        },
+        {
+            "repository": "https://github.com/yukazakiri/koakademy-module-student-medical-records"
+        }
+    ]
+}

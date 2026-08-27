@@ -38,6 +38,22 @@ later automated, use a protected environment and a secret manager with audit
 logging; never put the private key in GitHub Actions logs or ordinary
 repository variables.
 
+## Automated rebuilds
+
+`.github/workflows/rebuild.yml` regenerates `registry.json` and `packages.json`
+from the module repositories listed in `modules.json`. It runs daily, on
+`workflow_dispatch`, and on `repository_dispatch` (`module-released`). It uses
+`scripts/rebuild-registry.php`, validates the result, then either:
+
+- signs the catalog and pushes to `master` when `REGISTRY_PRIVATE_KEY` is
+  available in a protected environment, or
+- opens a pull request for a maintainer to sign and merge.
+
+The rebuild is idempotent: when no module has a new release, the generated
+files match the committed ones and nothing is pushed. Signing remains a
+maintainer-controlled step when the private key is not configured as a secret.
+
+
 ## Local container
 
 The local Docker Compose stack serves the Composer repository and persists the
