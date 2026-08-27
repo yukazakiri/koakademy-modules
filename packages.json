@@ -1,42 +1,6 @@
 {
     "packages": {
         "koakademy/announcement": {
-            "1.0.0": {
-                "name": "koakademy/announcement",
-                "version": "1.0.0",
-                "type": "library",
-                "dist": {
-                    "type": "zip",
-                    "url": "https://github.com/yukazakiri/koakademy-module-announcement/archive/refs/tags/v1.0.0.zip",
-                    "shasum": "941e77a0d387879dd3bb276dd4d41b3ed29c5498"
-                },
-                "source": {
-                    "type": "git",
-                    "url": "https://github.com/yukazakiri/koakademy-module-announcement.git",
-                    "reference": "v1.0.0"
-                },
-                "require": {
-                    "php": ">=8.5 <8.6",
-                    "filament/filament": "^5.0",
-                    "laravel/framework": "^13.0",
-                    "nwidart/laravel-modules": "^13.0",
-                    "spatie/laravel-permission": "^6.21"
-                },
-                "autoload": {
-                    "psr-4": {
-                        "Modules\\Announcement\\": "app/",
-                        "Modules\\Announcement\\Database\\Factories\\": "database/factories/",
-                        "Modules\\Announcement\\Database\\Seeders\\": "database/seeders/"
-                    }
-                },
-                "extra": {
-                    "laravel": {
-                        "providers": [
-                            "Modules\\Announcement\\Providers\\AnnouncementServiceProvider"
-                        ]
-                    }
-                }
-            },
             "1.0.1": {
                 "name": "koakademy/announcement",
                 "version": "1.0.1",
@@ -72,22 +36,58 @@
                         ]
                     }
                 }
-            }
-        },
-        "koakademy/cashier": {
+            },
             "1.0.0": {
-                "name": "koakademy/cashier",
+                "name": "koakademy/announcement",
                 "version": "1.0.0",
                 "type": "library",
                 "dist": {
                     "type": "zip",
-                    "url": "https://github.com/yukazakiri/koakademy-module-cashier/archive/refs/tags/v1.0.0.zip",
-                    "shasum": "8e4679ea44c5b54309ddbd2839633b848a85b9ed"
+                    "url": "https://github.com/yukazakiri/koakademy-module-announcement/archive/refs/tags/v1.0.0.zip",
+                    "shasum": "941e77a0d387879dd3bb276dd4d41b3ed29c5498"
+                },
+                "source": {
+                    "type": "git",
+                    "url": "https://github.com/yukazakiri/koakademy-module-announcement.git",
+                    "reference": "v1.0.0"
+                },
+                "require": {
+                    "php": ">=8.5 <8.6",
+                    "filament/filament": "^5.0",
+                    "laravel/framework": "^13.0",
+                    "nwidart/laravel-modules": "^13.0",
+                    "spatie/laravel-permission": "^6.21"
+                },
+                "autoload": {
+                    "psr-4": {
+                        "Modules\\Announcement\\": "app/",
+                        "Modules\\Announcement\\Database\\Factories\\": "database/factories/",
+                        "Modules\\Announcement\\Database\\Seeders\\": "database/seeders/"
+                    }
+                },
+                "extra": {
+                    "laravel": {
+                        "providers": [
+                            "Modules\\Announcement\\Providers\\AnnouncementServiceProvider"
+                        ]
+                    }
+                }
+            }
+        },
+        "koakademy/cashier": {
+            "1.0.1": {
+                "name": "koakademy/cashier",
+                "version": "1.0.1",
+                "type": "library",
+                "dist": {
+                    "type": "zip",
+                    "url": "https://github.com/yukazakiri/koakademy-module-cashier/archive/refs/tags/v1.0.1.zip",
+                    "shasum": "bdab7c956cb76039b62b375d62590607f5788092"
                 },
                 "source": {
                     "type": "git",
                     "url": "https://github.com/yukazakiri/koakademy-module-cashier.git",
-                    "reference": "v1.0.0"
+                    "reference": "v1.0.1"
                 },
                 "require": {
                     "php": ">=8.5 <8.6",
@@ -110,19 +110,19 @@
                     }
                 }
             },
-            "1.0.1": {
+            "1.0.0": {
                 "name": "koakademy/cashier",
-                "version": "1.0.1",
+                "version": "1.0.0",
                 "type": "library",
                 "dist": {
                     "type": "zip",
-                    "url": "https://github.com/yukazakiri/koakademy-module-cashier/archive/refs/tags/v1.0.1.zip",
-                    "shasum": "bdab7c956cb76039b62b375d62590607f5788092"
+                    "url": "https://github.com/yukazakiri/koakademy-module-cashier/archive/refs/tags/v1.0.0.zip",
+                    "shasum": "8e4679ea44c5b54309ddbd2839633b848a85b9ed"
                 },
                 "source": {
                     "type": "git",
                     "url": "https://github.com/yukazakiri/koakademy-module-cashier.git",
-                    "reference": "v1.0.1"
+                    "reference": "v1.0.0"
                 },
                 "require": {
                     "php": ">=8.5 <8.6",
@@ -223,41 +223,6 @@
             }
         },
         "koakademy/inventory": {
-            "1.0.0": {
-                "name": "koakademy/inventory",
-                "version": "1.0.0",
-                "type": "library",
-                "dist": {
-                    "type": "zip",
-                    "url": "https://github.com/yukazakiri/koakademy-module-inventory/archive/refs/tags/v1.0.0.zip",
-                    "shasum": "43d8a17ee01e39bf0f2386a306c96184f315f047"
-                },
-                "source": {
-                    "type": "git",
-                    "url": "https://github.com/yukazakiri/koakademy-module-inventory.git",
-                    "reference": "v1.0.0"
-                },
-                "require": {
-                    "php": ">=8.5 <8.6",
-                    "filament/filament": "^5.0",
-                    "laravel/framework": "^13.0",
-                    "nwidart/laravel-modules": "^13.0"
-                },
-                "autoload": {
-                    "psr-4": {
-                        "Modules\\Inventory\\": "app/",
-                        "Modules\\Inventory\\Database\\Factories\\": "database/factories/",
-                        "Modules\\Inventory\\Database\\Seeders\\": "database/seeders/"
-                    }
-                },
-                "extra": {
-                    "laravel": {
-                        "providers": [
-                            "Modules\\Inventory\\Providers\\InventoryServiceProvider"
-                        ]
-                    }
-                }
-            },
             "1.0.1": {
                 "name": "koakademy/inventory",
                 "version": "1.0.1",
@@ -292,45 +257,44 @@
                         ]
                     }
                 }
-            }
-        },
-        "koakademy/library-system": {
+            },
             "1.0.0": {
-                "name": "koakademy/library-system",
+                "name": "koakademy/inventory",
                 "version": "1.0.0",
                 "type": "library",
                 "dist": {
                     "type": "zip",
-                    "url": "https://github.com/yukazakiri/koakademy-module-library-system/archive/refs/tags/v1.0.0.zip",
-                    "shasum": "511fef213310f5980eccd34d675d23c2d95c5573"
+                    "url": "https://github.com/yukazakiri/koakademy-module-inventory/archive/refs/tags/v1.0.0.zip",
+                    "shasum": "43d8a17ee01e39bf0f2386a306c96184f315f047"
                 },
                 "source": {
                     "type": "git",
-                    "url": "https://github.com/yukazakiri/koakademy-module-library-system.git",
+                    "url": "https://github.com/yukazakiri/koakademy-module-inventory.git",
                     "reference": "v1.0.0"
                 },
                 "require": {
                     "php": ">=8.5 <8.6",
                     "filament/filament": "^5.0",
                     "laravel/framework": "^13.0",
-                    "nwidart/laravel-modules": "^13.0",
-                    "spatie/laravel-tags": "^4.10"
+                    "nwidart/laravel-modules": "^13.0"
                 },
                 "autoload": {
                     "psr-4": {
-                        "Modules\\LibrarySystem\\": "app/",
-                        "Modules\\LibrarySystem\\Database\\Factories\\": "database/factories/",
-                        "Modules\\LibrarySystem\\Database\\Seeders\\": "database/seeders/"
+                        "Modules\\Inventory\\": "app/",
+                        "Modules\\Inventory\\Database\\Factories\\": "database/factories/",
+                        "Modules\\Inventory\\Database\\Seeders\\": "database/seeders/"
                     }
                 },
                 "extra": {
                     "laravel": {
                         "providers": [
-                            "Modules\\LibrarySystem\\Providers\\LibrarySystemServiceProvider"
+                            "Modules\\Inventory\\Providers\\InventoryServiceProvider"
                         ]
                     }
                 }
-            },
+            }
+        },
+        "koakademy/library-system": {
             "1.0.1": {
                 "name": "koakademy/library-system",
                 "version": "1.0.1",
@@ -366,21 +330,19 @@
                         ]
                     }
                 }
-            }
-        },
-        "koakademy/notification-center": {
+            },
             "1.0.0": {
-                "name": "koakademy/notification-center",
+                "name": "koakademy/library-system",
                 "version": "1.0.0",
                 "type": "library",
                 "dist": {
                     "type": "zip",
-                    "url": "https://github.com/yukazakiri/koakademy-module-notification-center/archive/refs/tags/v1.0.0.zip",
-                    "shasum": "bc233c313ce774c412b852b9f92ffe6f747304a8"
+                    "url": "https://github.com/yukazakiri/koakademy-module-library-system/archive/refs/tags/v1.0.0.zip",
+                    "shasum": "511fef213310f5980eccd34d675d23c2d95c5573"
                 },
                 "source": {
                     "type": "git",
-                    "url": "https://github.com/yukazakiri/koakademy-module-notification-center.git",
+                    "url": "https://github.com/yukazakiri/koakademy-module-library-system.git",
                     "reference": "v1.0.0"
                 },
                 "require": {
@@ -388,23 +350,25 @@
                     "filament/filament": "^5.0",
                     "laravel/framework": "^13.0",
                     "nwidart/laravel-modules": "^13.0",
-                    "spatie/laravel-permission": "^6.21"
+                    "spatie/laravel-tags": "^4.10"
                 },
                 "autoload": {
                     "psr-4": {
-                        "Modules\\NotificationCenter\\": "app/",
-                        "Modules\\NotificationCenter\\Database\\Factories\\": "database/factories/",
-                        "Modules\\NotificationCenter\\Database\\Seeders\\": "database/seeders/"
+                        "Modules\\LibrarySystem\\": "app/",
+                        "Modules\\LibrarySystem\\Database\\Factories\\": "database/factories/",
+                        "Modules\\LibrarySystem\\Database\\Seeders\\": "database/seeders/"
                     }
                 },
                 "extra": {
                     "laravel": {
                         "providers": [
-                            "Modules\\NotificationCenter\\Providers\\NotificationCenterServiceProvider"
+                            "Modules\\LibrarySystem\\Providers\\LibrarySystemServiceProvider"
                         ]
                     }
                 }
-            },
+            }
+        },
+        "koakademy/notification-center": {
             "1.0.1": {
                 "name": "koakademy/notification-center",
                 "version": "1.0.1",
@@ -440,22 +404,58 @@
                         ]
                     }
                 }
-            }
-        },
-        "koakademy/student-medical-records": {
+            },
             "1.0.0": {
-                "name": "koakademy/student-medical-records",
+                "name": "koakademy/notification-center",
                 "version": "1.0.0",
                 "type": "library",
                 "dist": {
                     "type": "zip",
-                    "url": "https://github.com/yukazakiri/koakademy-module-student-medical-records/archive/refs/tags/v1.0.0.zip",
-                    "shasum": "d8e12ca84e4eafdb54e552c52db7a7fe97f7fdd3"
+                    "url": "https://github.com/yukazakiri/koakademy-module-notification-center/archive/refs/tags/v1.0.0.zip",
+                    "shasum": "bc233c313ce774c412b852b9f92ffe6f747304a8"
+                },
+                "source": {
+                    "type": "git",
+                    "url": "https://github.com/yukazakiri/koakademy-module-notification-center.git",
+                    "reference": "v1.0.0"
+                },
+                "require": {
+                    "php": ">=8.5 <8.6",
+                    "filament/filament": "^5.0",
+                    "laravel/framework": "^13.0",
+                    "nwidart/laravel-modules": "^13.0",
+                    "spatie/laravel-permission": "^6.21"
+                },
+                "autoload": {
+                    "psr-4": {
+                        "Modules\\NotificationCenter\\": "app/",
+                        "Modules\\NotificationCenter\\Database\\Factories\\": "database/factories/",
+                        "Modules\\NotificationCenter\\Database\\Seeders\\": "database/seeders/"
+                    }
+                },
+                "extra": {
+                    "laravel": {
+                        "providers": [
+                            "Modules\\NotificationCenter\\Providers\\NotificationCenterServiceProvider"
+                        ]
+                    }
+                }
+            }
+        },
+        "koakademy/student-medical-records": {
+            "1.0.1": {
+                "name": "koakademy/student-medical-records",
+                "version": "1.0.1",
+                "type": "library",
+                "dist": {
+                    "type": "zip",
+                    "url": "https://github.com/yukazakiri/koakademy-module-student-medical-records/archive/refs/tags/v1.0.1.zip",
+                    "shasum": "961dd9342dd4489837d161017971ae0e8b806126"
                 },
                 "source": {
                     "type": "git",
                     "url": "https://github.com/yukazakiri/koakademy-module-student-medical-records.git",
-                    "reference": "v1.0.0"
+                    "reference": "v1.0.1"
                 },
                 "require": {
                     "php": ">=8.5 <8.6",
@@ -478,19 +478,19 @@
                     }
                 }
             },
-            "1.0.1": {
+            "1.0.0": {
                 "name": "koakademy/student-medical-records",
-                "version": "1.0.1",
+                "version": "1.0.0",
                 "type": "library",
                 "dist": {
                     "type": "zip",
-                    "url": "https://github.com/yukazakiri/koakademy-module-student-medical-records/archive/refs/tags/v1.0.1.zip",
-                    "shasum": "961dd9342dd4489837d161017971ae0e8b806126"
+                    "url": "https://github.com/yukazakiri/koakademy-module-student-medical-records/archive/refs/tags/v1.0.0.zip",
+                    "shasum": "d8e12ca84e4eafdb54e552c52db7a7fe97f7fdd3"
                 },
                 "source": {
                     "type": "git",
                     "url": "https://github.com/yukazakiri/koakademy-module-student-medical-records.git",
-                    "reference": "v1.0.1"
+                    "reference": "v1.0.0"
                 },
                 "require": {
                     "php": ">=8.5 <8.6",
