@@ -7,6 +7,7 @@ on:
             - 'registry.json'
             - 'packages.json'
             - 'registry-public-key.txt'
+            - 'scripts/**'
             - '.github/workflows/pages.yml'
     workflow_dispatch:
 
@@ -22,6 +23,13 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
+            - uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '8.5'
+                  extensions: sodium
+                  coverage: none
+            - run: php scripts/validate-registry.php
+            - run: php scripts/verify-registry.php
             - run: mkdir -p dist && cp registry.json packages.json registry-public-key.txt dist/
             - uses: actions/upload-pages-artifact@v3
               with:

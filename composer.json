@@ -5,5 +5,9 @@
     "license": "AGPL-3.0-or-later",
     "require": {
         "php": ">=8.5 <8.6"
+    },
+    "scripts": {
+        "registry-validate": "@php scripts/validate-registry.php",
+        "registry-verify": "@php scripts/verify-registry.php"
     }
 }

@@ -21,5 +21,10 @@ jobs:
                   coverage: none
             - run: php -l scripts/ensure-signing-key.php
             - run: php -l scripts/sign-registry.php
+            - run: php -l scripts/update-module.php
+            - run: php -l scripts/validate-registry.php
             - run: php -l scripts/verify-registry.php
-            - run: php scripts/verify-registry.php
+            - run: php scripts/validate-registry.php
+            - name: Verify signed catalog on master
+              if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+              run: php scripts/verify-registry.php
