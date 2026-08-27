@@ -1,6 +1,6 @@
 {
     "schema": 1,
-    "generated_at": "2026-08-26T08:25:05Z",
+    "generated_at": "2026-08-27T04:46:45Z",
     "modules": [
         {
             "name": "Announcement",
@@ -87,6 +87,41 @@
                     "released_at": "2026-08-26T07:25:00Z",
                     "requires": {
                         "core": ">=1.20.0",
+                        "php": ">=8.5"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Forms",
+            "alias": "forms",
+            "composer_package": "koakademy/forms",
+            "version": "1.1.0",
+            "description": "Configurable online forms, surveys, evaluations, and secure record-linked submissions.",
+            "author": "KoAkademy contributors",
+            "license": "AGPL-3.0-or-later",
+            "requires": {
+                "core": ">=1.22.0",
+                "php": ">=8.5",
+                "modules": []
+            },
+            "compatibility": {
+                "laravel": "^13.0",
+                "filament": "^5.0"
+            },
+            "providers": [
+                "Modules\\Forms\\Providers\\FormsServiceProvider"
+            ],
+            "repository": "https://github.com/yukazakiri/koakademy-module-forms",
+            "homepage": "https://github.com/yukazakiri/koakademy-module-forms",
+            "versions": [
+                {
+                    "version": "1.1.0",
+                    "asset_url": "https://github.com/yukazakiri/koakademy-module-forms/archive/refs/tags/v1.1.0.zip",
+                    "sha256": "65f091ca98c1730ae044b6a5fb8a55b7bf7ecd5ccaa4778c1ba03631977ecbf1",
+                    "released_at": "2026-08-27T04:41:54Z",
+                    "requires": {
+                        "core": ">=1.22.0",
                         "php": ">=8.5"
                     }
                 }
@@ -272,9 +307,5 @@
                 }
             ]
         }
-    ],
-    "signature": {
-        "algorithm": "ed25519",
-        "value": "3XyMvGw_ZyyevRdBex_A03OY7yasZDQ2yNfqCymbx_UrVRk80tywLXWqeOMfL3EkTgmYUBo6NA0KV0QAvUM-CA"
-    }
+    ]
 }
