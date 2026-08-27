@@ -317,5 +317,9 @@
                 }
             ]
         }
-    ]
+    ],
+    "signature": {
+        "algorithm": "ed25519",
+        "value": "S9QeB8BgGWpWgoNfmdC5at9X58qoVbYAppTxP21YGsQ_6TLf9cORiUuJfM42k3TLiDXOI8z8lI3REc68QrHdAg"
+    }
 }
