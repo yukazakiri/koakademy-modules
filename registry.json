@@ -102,7 +102,7 @@
             "license": "AGPL-3.0-or-later",
             "requires": {
                 "core": ">=1.22.0",
-                "php": ">=8.5",
+                "php": ">=8.5 <8.6",
                 "modules": []
             },
             "compatibility": {
@@ -122,7 +122,7 @@
                     "released_at": "2026-08-27T04:41:54Z",
                     "requires": {
                         "core": ">=1.22.0",
-                        "php": ">=8.5"
+                        "php": ">=8.5 <8.6"
                     }
                 }
             ]
