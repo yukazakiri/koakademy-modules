@@ -1,6 +1,6 @@
 {
     "schema": 1,
-    "generated_at": "2026-08-27T07:41:54Z",
+    "generated_at": "2026-09-08T07:28:56Z",
     "modules": [
         {
             "name": "Announcement",
@@ -96,7 +96,7 @@
             "name": "Forms",
             "alias": "forms",
             "composer_package": "koakademy/forms",
-            "version": "1.1.1",
+            "version": "1.4.0",
             "description": "Configurable online forms, surveys, evaluations, and secure record-linked submissions.",
             "author": "KoAkademy contributors",
             "license": "AGPL-3.0-or-later",
@@ -116,6 +116,16 @@
             "homepage": "https://github.com/yukazakiri/koakademy-module-forms",
             "versions": [
                 {
+                    "version": "1.4.0",
+                    "asset_url": "https://github.com/yukazakiri/koakademy-module-forms/archive/refs/tags/v1.4.0.zip",
+                    "sha256": "fc92deec729db3bde8c2aa7c4178b480479aa153f795097de6c0dd8f6d1678f4",
+                    "released_at": "2026-09-06T08:54:43Z",
+                    "requires": {
+                        "core": ">=1.22.0",
+                        "php": ">=8.5 <8.6"
+                    }
+                },
+                {
                     "version": "1.1.1",
                     "asset_url": "https://github.com/yukazakiri/koakademy-module-forms/archive/refs/tags/v1.1.1.zip",
                     "sha256": "a88355c8f97027bf16ee44a4a12a1a7a532d1309256e962e68ecda54ccd6b9bc",
@@ -130,6 +140,41 @@
                     "asset_url": "https://github.com/yukazakiri/koakademy-module-forms/archive/refs/tags/v1.1.0.zip",
                     "sha256": "65f091ca98c1730ae044b6a5fb8a55b7bf7ecd5ccaa4778c1ba03631977ecbf1",
                     "released_at": "2026-08-27T04:41:54Z",
+                    "requires": {
+                        "core": ">=1.22.0",
+                        "php": ">=8.5 <8.6"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "HrManagement",
+            "alias": "hr-management",
+            "composer_package": "koakademy/hr-management",
+            "version": "1.0.0",
+            "description": "Core HR, attendance, leave, and evaluations for KoAkademy.",
+            "author": "KoAkademy contributors",
+            "license": "AGPL-3.0-or-later",
+            "requires": {
+                "core": ">=1.22.0",
+                "php": ">=8.5 <8.6",
+                "modules": []
+            },
+            "compatibility": {
+                "filament": "^5.0",
+                "laravel": "^13.0"
+            },
+            "providers": [
+                "Modules\\HrManagement\\Providers\\HrManagementServiceProvider"
+            ],
+            "repository": "https://github.com/yukazakiri/koakademy-module-hr-management",
+            "homepage": "https://github.com/yukazakiri/koakademy-module-hr-management",
+            "versions": [
+                {
+                    "version": "1.0.0",
+                    "asset_url": "https://github.com/yukazakiri/koakademy-module-hr-management/archive/refs/tags/v1.0.0.zip",
+                    "sha256": "613400e29f639d444ad9ec0c7e4abe742ea2084e09c76d2ef11ffadba2456e2c",
+                    "released_at": "2026-09-04T02:01:06Z",
                     "requires": {
                         "core": ">=1.22.0",
                         "php": ">=8.5 <8.6"
@@ -320,6 +365,6 @@
     ],
     "signature": {
         "algorithm": "ed25519",
-        "value": "S9QeB8BgGWpWgoNfmdC5at9X58qoVbYAppTxP21YGsQ_6TLf9cORiUuJfM42k3TLiDXOI8z8lI3REc68QrHdAg"
+        "value": "6Qnr2cJHA7eIRw6ZOXwXYGz3BITR0EinWAV_v9jtCT7i3tcflWx-IEmUK2YouwcY602d3UJ7XfBO2KZ7i0V1CA"
     }
 }

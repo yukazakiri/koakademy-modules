@@ -147,6 +147,43 @@
             }
         },
         "koakademy/forms": {
+            "1.4.0": {
+                "name": "koakademy/forms",
+                "version": "1.4.0",
+                "type": "library",
+                "dist": {
+                    "type": "zip",
+                    "url": "https://github.com/yukazakiri/koakademy-module-forms/archive/refs/tags/v1.4.0.zip",
+                    "shasum": "803c28d301923ef9b86c273b3e44e75fad193ccf"
+                },
+                "source": {
+                    "type": "git",
+                    "url": "https://github.com/yukazakiri/koakademy-module-forms.git",
+                    "reference": "v1.4.0"
+                },
+                "require": {
+                    "php": ">=8.5 <8.6",
+                    "filament/filament": "^5.0",
+                    "inertiajs/inertia-laravel": "^3.0",
+                    "laravel/framework": "^13.0",
+                    "nwidart/laravel-modules": "^13.0",
+                    "spatie/laravel-permission": "^6.21"
+                },
+                "autoload": {
+                    "psr-4": {
+                        "Modules\\Forms\\": "app/",
+                        "Modules\\Forms\\Database\\Factories\\": "database/factories/",
+                        "Modules\\Forms\\Database\\Seeders\\": "database/seeders/"
+                    }
+                },
+                "extra": {
+                    "laravel": {
+                        "providers": [
+                            "Modules\\Forms\\Providers\\FormsServiceProvider"
+                        ]
+                    }
+                }
+            },
             "1.1.1": {
                 "name": "koakademy/forms",
                 "version": "1.1.1",
@@ -217,6 +254,45 @@
                     "laravel": {
                         "providers": [
                             "Modules\\Forms\\Providers\\FormsServiceProvider"
+                        ]
+                    }
+                }
+            }
+        },
+        "koakademy/hr-management": {
+            "1.0.0": {
+                "name": "koakademy/hr-management",
+                "version": "1.0.0",
+                "type": "library",
+                "dist": {
+                    "type": "zip",
+                    "url": "https://github.com/yukazakiri/koakademy-module-hr-management/archive/refs/tags/v1.0.0.zip",
+                    "shasum": "54b62f20b296c7917bdb47b0845f8c7ef3b77169"
+                },
+                "source": {
+                    "type": "git",
+                    "url": "https://github.com/yukazakiri/koakademy-module-hr-management.git",
+                    "reference": "v1.0.0"
+                },
+                "require": {
+                    "php": ">=8.5 <8.6",
+                    "filament/filament": "^5.0",
+                    "inertiajs/inertia-laravel": "^3.0",
+                    "laravel/framework": "^13.0",
+                    "nwidart/laravel-modules": "^13.0",
+                    "spatie/laravel-permission": "^6.21"
+                },
+                "autoload": {
+                    "psr-4": {
+                        "Modules\\HrManagement\\": "app/",
+                        "Modules\\HrManagement\\Database\\Factories\\": "database/factories/",
+                        "Modules\\HrManagement\\Database\\Seeders\\": "database/seeders/"
+                    }
+                },
+                "extra": {
+                    "laravel": {
+                        "providers": [
+                            "Modules\\HrManagement\\Providers\\HrManagementServiceProvider"
                         ]
                     }
                 }
