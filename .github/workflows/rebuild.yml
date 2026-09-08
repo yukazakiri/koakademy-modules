@@ -1,0 +1,86 @@
+name: Rebuild module registry
+
+on:
+    schedule:
+        - cron: '0 0 * * *'
+    workflow_dispatch:
+    repository_dispatch:
+        types: [module-released]
+
+permissions:
+    contents: write
+    pull-requests: write
+
+jobs:
+    rebuild:
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '8.5'
+                  extensions: sodium, zip, curl, mbstring
+                  coverage: none
+
+            - name: Rebuild registry from module releases
+              run: php scripts/rebuild-registry.php
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Validate registry
+              run: php scripts/validate-registry.php
+
+            - name: Detect changes
+              id: diff
+              run: |
+                  if git diff --quiet -- registry.json packages.json; then
+                      echo "changed=false" >> "$GITHUB_OUTPUT"
+                  else
+                      echo "changed=true" >> "$GITHUB_OUTPUT"
+                  fi
+
+            - name: Detect signing key
+              id: signing
+              env:
+                  REGISTRY_PRIVATE_KEY: ${{ secrets.REGISTRY_PRIVATE_KEY }}
+              run: |
+                  if [ -n "$REGISTRY_PRIVATE_KEY" ]; then
+                      echo "available=true" >> "$GITHUB_OUTPUT"
+                  else
+                      echo "available=false" >> "$GITHUB_OUTPUT"
+                  fi
+
+            - name: Sign and push to master
+              if: steps.diff.outputs.changed == 'true' && steps.signing.outputs.available == 'true'
+              env:
+                  REGISTRY_PRIVATE_KEY: ${{ secrets.REGISTRY_PRIVATE_KEY }}
+              run: |
+                  printf '%s\n' "$REGISTRY_PRIVATE_KEY" > /tmp/registry-private.key
+                  php scripts/sign-registry.php registry.json /tmp/registry-private.key registry.json
+                  php scripts/validate-registry.php
+                  php scripts/verify-registry.php
+                  git config user.name 'github-actions[bot]'
+                  git config user.email 'github-actions[bot]@users.noreply.github.com'
+                  git add registry.json packages.json
+                  git commit -m 'chore(registry): rebuild module catalog' || true
+                  git push
+
+            - name: Open pull request
+              if: steps.diff.outputs.changed == 'true' && steps.signing.outputs.available == 'false'
+              uses: peter-evans/create-pull-request@v7
+              with:
+                  commit-message: 'chore(registry): rebuild module catalog'
+                  branch: chore/registry-rebuild
+                  title: 'chore(registry): rebuild module catalog'
+                  body: |
+                      Automated catalog rebuild from module release tags.
+
+                      The Ed25519 signature was removed by the rebuild. A maintainer
+                      must sign `registry.json` and merge this branch. CI will not
+                      publish an unsigned catalog to `master`.
+                  add-paths: |
+                      registry.json
+                      packages.json

@@ -27,6 +27,11 @@ like a different package or prevent an existing application from booting.
 
 ## Contributor workflow
 
+Registry metadata is rebuilt automatically by `.github/workflows/rebuild.yml`
+from the repositories listed in `modules.json`. The manual commands below are
+for one-off or local changes only; normal releases no longer require them.
+
+
 Run these commands from a clean checkout of this registry repository after
 the module release has been tagged:
 
