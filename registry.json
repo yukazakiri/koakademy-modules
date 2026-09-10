@@ -1,6 +1,6 @@
 {
     "schema": 1,
-    "generated_at": "2026-09-10T02:12:23Z",
+    "generated_at": "2026-09-10T04:08:11Z",
     "modules": [
         {
             "name": "Announcement",
@@ -118,7 +118,7 @@
                 {
                     "version": "1.5.0",
                     "asset_url": "https://github.com/yukazakiri/koakademy-module-forms/archive/refs/tags/v1.5.0.zip",
-                    "sha256": "327831dd354dbf17aa7d958ed568036b7ad7340e7de6fca5580f6bf98f4743dd",
+                    "sha256": "3335005c37d779cc2398d4ad7c040726a3e30cd235fa5f37cd8c57355f34ab01",
                     "released_at": "2026-09-10T02:11:50Z",
                     "requires": {
                         "core": ">=1.22.0",
@@ -372,9 +372,5 @@
                 }
             ]
         }
-    ],
-    "signature": {
-        "algorithm": "ed25519",
-        "value": "WqnDpUSAEJrOP2dJF6WFDL3JvM-tsG2JflXUyMA6DVx4_s_VlSIRMdkLjCaKffnsdIAVCexzz1NvsZqw2RZRAQ"
-    }
+    ]
 }

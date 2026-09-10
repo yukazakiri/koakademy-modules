@@ -154,7 +154,7 @@
                 "dist": {
                     "type": "zip",
                     "url": "https://github.com/yukazakiri/koakademy-module-forms/archive/refs/tags/v1.5.0.zip",
-                    "shasum": "f4330bf0a7eee80aa0fea0e43565adfdf62030cd"
+                    "shasum": "0b17a84b2c3f90ea7d7103817a784e29386b1ebc"
                 },
                 "source": {
                     "type": "git",
