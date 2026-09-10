@@ -1,6 +1,6 @@
 {
     "schema": 1,
-    "generated_at": "2026-09-08T07:28:56Z",
+    "generated_at": "2026-09-10T03:46:06Z",
     "modules": [
         {
             "name": "Announcement",
@@ -96,7 +96,7 @@
             "name": "Forms",
             "alias": "forms",
             "composer_package": "koakademy/forms",
-            "version": "1.4.0",
+            "version": "1.5.0",
             "description": "Configurable online forms, surveys, evaluations, and secure record-linked submissions.",
             "author": "KoAkademy contributors",
             "license": "AGPL-3.0-or-later",
@@ -115,6 +115,16 @@
             "repository": "https://github.com/yukazakiri/koakademy-module-forms",
             "homepage": "https://github.com/yukazakiri/koakademy-module-forms",
             "versions": [
+                {
+                    "version": "1.5.0",
+                    "asset_url": "https://github.com/yukazakiri/koakademy-module-forms/archive/refs/tags/v1.5.0.zip",
+                    "sha256": "327831dd354dbf17aa7d958ed568036b7ad7340e7de6fca5580f6bf98f4743dd",
+                    "released_at": "2026-09-10T02:11:50Z",
+                    "requires": {
+                        "core": ">=1.22.0",
+                        "php": ">=8.5 <8.6"
+                    }
+                },
                 {
                     "version": "1.4.0",
                     "asset_url": "https://github.com/yukazakiri/koakademy-module-forms/archive/refs/tags/v1.4.0.zip",
@@ -365,6 +375,6 @@
     ],
     "signature": {
         "algorithm": "ed25519",
-        "value": "6Qnr2cJHA7eIRw6ZOXwXYGz3BITR0EinWAV_v9jtCT7i3tcflWx-IEmUK2YouwcY602d3UJ7XfBO2KZ7i0V1CA"
+        "value": "BPKsFdURm9CEtu6a4B11NwlyrfbdJefiwGJRtzBg6pcQEGuhYKDTj8qw2SCpJJ0mtZbsGcb2PUsc_5GEN-hxAQ"
     }
 }
