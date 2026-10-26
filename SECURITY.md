@@ -19,9 +19,17 @@ corresponding private key as production credentials:
 - never commit it or place it in a module repository;
 - keep it in a protected secret manager or persistent registry volume;
 - restrict signing access to maintainers;
+- keep the private key out of release discovery and contributor CI;
 - verify the catalog after signing and before publishing;
 - rotate it only with a coordinated update of every application’s configured
   public key.
+
+Newly signed catalogs bind `packages.json` with `packages_sha256`; publish the
+verified pair together. Legacy catalogs remain verifiable without rewriting
+their signatures. New releases use immutable commit archives and references;
+do not move a released tag or replace an existing checksum. The rebuild stages
+all changes and submits a review PR rather than signing and publishing code
+discovered from another repository automatically.
 
 If the private key may have been exposed, stop publishing, preserve the
 current public catalog, and coordinate a documented trust-root rotation. Do

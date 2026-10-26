@@ -2,3 +2,5 @@
 /public/
 /.env
 *.local.json
+/vendor/
+/.tmp/

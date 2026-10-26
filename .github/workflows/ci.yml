@@ -3,6 +3,7 @@ name: Registry CI
 on:
     push:
     pull_request:
+    workflow_dispatch:
 
 permissions:
     contents: read
@@ -13,18 +14,24 @@ jobs:
         timeout-minutes: 10
 
         steps:
-            - uses: actions/checkout@v4
-            - uses: shivammathur/setup-php@v2
+            - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+              with:
+                  persist-credentials: false
+            - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
               with:
                   php-version: '8.5'
-                  extensions: sodium
+                  extensions: sodium, zip
                   coverage: none
-            - run: php -l scripts/ensure-signing-key.php
-            - run: php -l scripts/sign-registry.php
-            - run: php -l scripts/update-module.php
-            - run: php -l scripts/validate-registry.php
-            - run: php -l scripts/verify-registry.php
-            - run: php scripts/validate-registry.php
+                  tools: composer:v2
+            - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+              with:
+                  path: ~/.cache/composer/files
+                  key: composer-${{ runner.os }}-${{ hashFiles('composer.lock') }}
+            - run: composer install --no-interaction --prefer-dist --no-progress
+            - run: composer validate --strict
+            - run: composer lint
+            - run: composer test
+            - run: composer registry-validate
             - name: Verify signed catalog on master
               if: github.event_name == 'push' && github.ref == 'refs/heads/master'
               run: php scripts/verify-registry.php

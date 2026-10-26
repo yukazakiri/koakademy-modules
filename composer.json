@@ -4,9 +4,12 @@
     "type": "project",
     "license": "AGPL-3.0-or-later",
     "require": {
-        "php": ">=8.5 <8.6"
+        "php": ">=8.5 <8.6",
+        "composer/semver": "^3.5"
     },
     "scripts": {
+        "lint": "@php scripts/lint.php",
+        "test": "@php tests/run.php",
         "registry-validate": "@php scripts/validate-registry.php",
         "registry-verify": "@php scripts/verify-registry.php"
     }

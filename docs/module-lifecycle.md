@@ -26,19 +26,27 @@ application image.
 4. The registry rebuild workflow detects the new tag automatically, either on
    its daily schedule or via a `module-released` dispatch from the module
    repository. No manual metadata edit is required; `scripts/rebuild-registry.php`
-   downloads the tag, recalculates checksums, and normalizes the manifest
-   version to the tag.
+   resolves a new tag to its immutable commit, downloads that commit's archive,
+   and recalculates checksums. The manifest version and repository must match
+   the release. Mismatches fail rather than being normalized. Already listed
+   historical releases retain their original archives and metadata.
 
-5. If the `REGISTRY_PRIVATE_KEY` secret is configured, the workflow signs the
-   catalog and pushes to `master`. Otherwise it opens a pull request; a
-   maintainer signs the catalog with the persistent Ed25519 private key and
-   verifies it:
+5. The workflow opens an unsigned pull request and leaves it untouched while
+   it awaits review. A maintainer reviews the exact `source_ref`, passing module
+   and host CI, migrations, permissions, frontend dependencies, and rollback
+   impact, then signs with the persistent Ed25519 private key and verifies it:
 
    ```sh
    php scripts/sign-registry.php registry.json /secure/registry-private.key registry.json
    php scripts/validate-registry.php
    php scripts/verify-registry.php
    ```
+
+   Signing also binds the exact `packages.json` bytes through `packages_sha256`.
+   The discovery workflow never receives the private key. Push the signed commit
+   with maintainer credentials to trigger PR CI, or manually dispatch Registry CI
+   on the generated branch; `GITHUB_TOKEN` PR creation does not trigger other
+   workflows automatically.
 
 6. Merge to `master`. Registry CI and the Pages workflow validate the signed
    files before the public catalog is published.
@@ -71,6 +79,8 @@ frontend build. Dokploy/Swarm must roll out that new image. After deployment:
 
 ```sh
 php artisan migrate --force
+php artisan modules:sync-permissions
+php artisan modules:validate --all
 php artisan optimize:clear
 php artisan optimize
 ```
@@ -111,6 +121,11 @@ For existing installations that already have legacy source-tree modules
 enabled, leave them enabled while planning their package migration. A
 standalone registry release cannot update a duplicate local module until the
 application is deliberately switched to the package.
+
+With the extension SDK, the application rejects duplicate names, aliases, or
+package identities. Remove the bundled copy in the same tested dependency
+migration that installs its packaged replacement. Preserve database tables,
+provider identities, route names, and module status during the move.
 
 ## Rollback
 

@@ -1,77 +1,70 @@
 # Registry CI and publishing
 
-## Pull requests and pushes
+## Local checks and contributor CI
 
-`.github/workflows/ci.yml` runs on pushes and pull requests. It performs PHP
-syntax checks, validates the relationship between `registry.json` and
-`packages.json`, and verifies the Ed25519 signature on pushes to `master`.
-
-Pull requests may contain unsigned generated catalog changes because the
-private signing key must not be available to contributors. A master push must
-be signed, so an unsigned or tampered catalog cannot be published accidentally.
-
-The core local equivalents are:
+Run PHP 8.5 with Sodium and ZIP:
 
 ```sh
-php -l scripts/ensure-signing-key.php
-php -l scripts/sign-registry.php
-php -l scripts/update-module.php
-php -l scripts/validate-registry.php
-php -l scripts/verify-registry.php
-php scripts/validate-registry.php
-php scripts/verify-registry.php
+composer install
+composer validate --strict
+composer lint
+composer test
+composer registry-validate
+composer registry-verify
 ```
 
-## GitHub Pages
+The primary workflow runs on pushes, pull requests, and manual dispatch. It
+installs the committed Composer lockfile, caches Composer downloads, lints all
+PHP scripts and tests, runs the offline regression suite, and validates both
+indexes. Errors fail the job. There are no private signing secrets, application
+servers, or live module APIs in these checks. Dependencies are downloaded during
+installation; the test suite itself uses temporary archives and throwaway keys.
 
-`.github/workflows/pages.yml` runs for registry/index, signing-key, script, and
-workflow changes on `master`. Before copying files to the Pages artifact it
-runs both structural validation and signature verification. This makes the
-published URL fail closed when a catalog is malformed or signed by the wrong
-key.
+PRs may contain unsigned proposals. Pushes to master must also pass signature
+verification with the committed public key. Historical signed catalogs remain
+verifiable. Newly signed catalogs include packages_sha256 and must match the
+exact Composer index bytes. Contributor CI cannot approve a module's application
+behavior: maintainers still need passing module and compatible host CI evidence.
 
-## No secrets in CI
+## Release discovery
 
-The public validation workflows need no repository secrets. The private
-signing operation is deliberately a maintainer-controlled step. If signing is
-later automated, use a protected environment and a secret manager with audit
-logging; never put the private key in GitHub Actions logs or ordinary
-repository variables.
+The rebuild workflow runs daily, manually, or on a module-released repository
+dispatch. It uses the modules.json allowlist, paginated stable tags, and immutable
+commit archives. A failure leaves the committed indexes intact. An unchanged
+run preserves their existing signature. Changes always become an unsigned PR;
+there is no signing secret or direct release push to master.
 
-## Automated rebuilds
+Runs are serialized. An open chore/registry-rebuild PR is left untouched while
+maintainers review and sign it. The repository must allow Actions to create
+pull requests. The built-in GITHUB_TOKEN has contents/PR write access only in
+this job; other workflows use read access except the Pages deployment job.
 
-`.github/workflows/rebuild.yml` regenerates `registry.json` and `packages.json`
-from the module repositories listed in `modules.json`. It runs daily, on
-`workflow_dispatch`, and on `repository_dispatch` (`module-released`). It uses
-`scripts/rebuild-registry.php`, validates the result, then either:
+GitHub does not trigger another workflow from a PR created using GITHUB_TOKEN.
+Push the reviewed, signed commit with maintainer credentials to run PR checks,
+or manually dispatch Registry CI on the generated branch before review. A
+private signing credential must never be added to contributor or discovery CI.
 
-- signs the catalog and pushes to `master` when `REGISTRY_PRIVATE_KEY` is
-  available in a protected environment, or
-- opens a pull request for a maintainer to sign and merge.
+## Publishing
 
-The rebuild is idempotent: when no module has a new release, the generated
-files match the committed ones and nothing is pushed. Signing remains a
-maintainer-controlled step when the private key is not configured as a secret.
+Pages installs the locked tooling and validates structure and signature before
+uploading the catalog, Composer index, and public key as one artifact. Verification
+rejects a mismatch between a newly signed catalog and its Composer index. The
+local container also validates and verifies its snapshot before serving it.
+These publication checks do not make Composer itself an Ed25519 verifier.
 
+The container's generated keypair persists in registry-data. Back up that volume
+through the deployment's secret-management process. Its key is separate from
+the existing public catalog's trust root; do not replace a production public key
+with a local development key.
 
-## Local container
+## Remaining operational requirements
 
-The local Docker Compose stack serves the Composer repository and persists the
-generated keypair in the `registry-data` volume. Back up that volume or the
-private key through the deployment’s secret-management process before
-recreating the registry service. A new key changes the trust root and requires
-coordinated application configuration updates.
+- Protect master and require Registry CI before merging reviewed, signed releases.
+- Keep signing access on a protected maintainer workstation or secret store.
+- Review source commits, module/host CI, permissions, migrations, frontend
+  dependencies, and rollback behavior before signing.
+- Roll back the host image and lockfile together; the registry never installs
+  code in an already-running school application.
 
-## Troubleshooting
-
-- `Registry structure is invalid`: compare the module manifest and Composer
-  package, then rerun `scripts/update-module.php`.
-- `The registry signature could not be verified`: restore the existing private
-  key or revert the unsigned catalog; do not generate a replacement key as a
-  quick fix.
-- Composer cannot resolve a new version: verify that Pages has published
-  `packages.json`, then update the KoAkademy application lockfile and rebuild
-  its image.
-- Marketplace shows a module but it cannot enable: confirm the matching
-  package is installed in the image and that its core/PHP compatibility matches
-  the running application version.
+These repository settings and private signing operations are not performed by
+the contributor workflows.

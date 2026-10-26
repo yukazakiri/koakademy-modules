@@ -5,14 +5,20 @@ declare(strict_types=1);
 $sourcePath = $argv[1] ?? __DIR__.'/../registry.json';
 $privatePath = $argv[2] ?? getenv('REGISTRY_PRIVATE_KEY') ?: __DIR__.'/../keys/private.key';
 $outputPath = $argv[3] ?? __DIR__.'/../registry.json';
+$packagesPath = $argv[4] ?? dirname($sourcePath).'/packages.json';
 
 $payload = json_decode((string) file_get_contents($sourcePath), true, 512, JSON_THROW_ON_ERROR);
 
-if (! is_array($payload)) {
+if (! is_array($payload) || ($payload['schema'] ?? null) !== 1 || ! is_array($payload['modules'] ?? null)
+    || ! array_is_list($payload['modules'])) {
     throw new RuntimeException('The registry payload must be a JSON object.');
 }
 
 unset($payload['signature']);
+if (! is_file($packagesPath)) {
+    throw new RuntimeException('The matching packages.json is required when signing.');
+}
+$payload['packages_sha256'] = hash_file('sha256', $packagesPath);
 
 $privateKey = base64UrlDecode(trim((string) file_get_contents($privatePath)));
 
@@ -25,6 +31,7 @@ $payload['signature'] = [
     'algorithm' => 'ed25519',
     'value' => base64UrlEncode(sodium_crypto_sign_detached($canonicalPayload, $privateKey)),
 ];
+sodium_memzero($privateKey);
 
 if (file_put_contents($outputPath, json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR).PHP_EOL, LOCK_EX) === false) {
     throw new RuntimeException("Unable to write signed registry [{$outputPath}].");

@@ -1,4 +1,4 @@
-﻿# KoAkademy Module Registry
+# KoAkademy Module Registry
 
 This repository publishes two read-only distribution indexes:
 
@@ -25,29 +25,45 @@ Composer package, a Laravel service provider, tests, and a semver tag matching
 the manifest version (`v1.2.3` for `1.2.3`). The registry discovers releases
 from the module repositories listed in `modules.json`.
 
-### Automatic rebuilds
+Use the [Koakademy extension starter and SDK](https://github.com/yukazakiri/koakademy/pull/486)
+for a working package, tenant policies, permissions, frontend integration, and
+contributor CI. Pin a compatible released host revision when using its workbench.
 
-`.github/workflows/rebuild.yml` regenerates both indexes without manual steps.
+### Reviewed rebuilds
+
+`.github/workflows/rebuild.yml` proposes updates to both indexes.
 It runs daily, on `workflow_dispatch`, and on a `repository_dispatch` event
-named `module-released`. For each module it downloads the highest semver tag,
-recalculates checksums, and normalizes the manifest version to the tag.
+named `module-released`. It selects the highest stable semver across paginated
+tags, resolves new releases to an immutable commit, reads metadata from that
+commit's ZIP without executing module code, and recalculates checksums. The
+archive's manifest version and repository must match the selected release;
+the tooling never rewrites a mismatched source manifest.
 
-If the `REGISTRY_PRIVATE_KEY` secret is configured, the workflow signs the
-catalog and pushes to `master`. Otherwise it opens an auto-generated pull
-request that a maintainer signs and merges.
+Changed catalogs always become unsigned pull requests for review. The discovery
+job has no private signing key and does not sign or push releases directly to `master`.
+An existing generated PR is left untouched while it awaits review. GitHub must
+allow Actions to create pull requests; the job uses its built-in `GITHUB_TOKEN`.
 
-To add a module to the catalog, add its repository to `modules.json` once. New
-releases no longer require a manual metadata change here.
+To add a module, submit a PR adding its repository to `modules.json`. Later tags
+are discovered without repeated allowlist edits, but every changed catalog still
+requires release review and signing. PRs created with `GITHUB_TOKEN` do not start
+other Actions workflows: push the reviewed, signed commit with maintainer
+credentials, or manually run Registry CI on the generated branch.
 
 ### Manual rebuild (optional)
 
 ```sh
+composer install
 php scripts/rebuild-registry.php
 php scripts/validate-registry.php
 ```
 
-The rebuild is deterministic and idempotent, so a no-op run leaves both files
-unchanged. The old signature is deliberately removed.
+The full rebuild is staged and validated before either index is replaced. A
+failure in a later module leaves the committed files intact; a no-op preserves
+both files and their signature byte for byte. Changed catalogs lose the old
+signature. Existing releases cannot be replaced with different bytes or silently
+downgraded. Historical tag-based entries remain unchanged; new releases record
+`source_ref` and use commit-based archives and Composer source references.
 
 ### Maintainer signing
 
@@ -62,6 +78,28 @@ php scripts/validate-registry.php
 php scripts/verify-registry.php
 ```
 
+New signatures include `packages_sha256`, binding the exact Composer index
+bytes into the signed catalog. Verification checks that binding before Pages
+or the local container serves it. Older published catalogs without this field
+remain verifiable with their existing key; this change does not rotate keys or
+resign the committed catalog. Composer consumers still rely on HTTPS and their
+lockfile; Composer does not itself verify the catalog's Ed25519 signature.
+
+## Verify locally
+
+```sh
+composer install
+composer validate --strict
+composer lint
+composer test
+composer registry-validate
+composer registry-verify
+```
+
+The regression suite uses temporary fixture archives, mocked GitHub responses,
+and throwaway signing keys. It needs no network, application server, or secrets
+after dependencies are installed. PHP 8.5 with Sodium and ZIP is required.
+
 ## Delivery lifecycle
 
 The complete release and container update sequence is documented in
@@ -69,8 +107,8 @@ The complete release and container update sequence is documented in
 
 1. Release a new module tag.
 2. The registry rebuild workflow detects the release.
-3. If the signing key is configured, the catalog is signed and merged
-automatically; otherwise a maintainer signs and merges the PR.
+3. A maintainer reviews the exact source commit, module and host CI, permissions,
+   migrations, frontend dependencies, and rollback impact, then signs and merges.
 4. Update the KoAkademy application Composer requirement and lockfile.
 5. Build and deploy a new application image.
 6. Run migrations/cache clearing and roll the Swarm service.
