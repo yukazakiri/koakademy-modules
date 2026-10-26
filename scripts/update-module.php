@@ -2,12 +2,20 @@
 
 declare(strict_types=1);
 
-$options = getopt('', ['module:', 'archive:', 'released-at::']);
+use function Koakademy\Registry\archiveMetadata;
+use function Koakademy\Registry\manifest;
+use function Koakademy\Registry\releasedAt;
+use function Koakademy\Registry\repository;
+use function Koakademy\Registry\writeIndexes;
+
+require_once __DIR__.'/lib/metadata.php';
+
+$options = getopt('', ['module:', 'archive:', 'released-at:', 'tag:', 'source-ref:', 'registry:', 'packages:']);
 $modulePath = $options['module'] ?? null;
 $archivePath = $options['archive'] ?? null;
 $releasedAt = $options['released-at'] ?? gmdate('Y-m-d\TH:i:s\Z');
-$registryPath = __DIR__.'/../registry.json';
-$packagesPath = __DIR__.'/../packages.json';
+$registryPath = $options['registry'] ?? __DIR__.'/../registry.json';
+$packagesPath = $options['packages'] ?? __DIR__.'/../packages.json';
 
 if (! is_string($modulePath) || ! is_string($archivePath)) {
     fail('Usage: php scripts/update-module.php --module=/path/to/module --archive=/path/to/release.zip [--released-at=YYYY-MM-DDTHH:MM:SSZ]');
@@ -17,11 +25,22 @@ $modulePath = realpath($modulePath) ?: $modulePath;
 $archivePath = realpath($archivePath) ?: $archivePath;
 $manifest = readJson($modulePath.'/module.json');
 $composer = readJson($modulePath.'/composer.json');
-$registry = readJson(__DIR__.'/../registry.json');
-$packages = readJson(__DIR__.'/../packages.json');
+$registry = readJson($registryPath);
+$packages = readJson($packagesPath);
 
 if (! is_file($archivePath)) {
     fail("Release archive [{$archivePath}] does not exist.");
+}
+
+manifest($manifest);
+releasedAt($releasedAt);
+[$archiveManifest, $archiveComposer] = archiveMetadata($archivePath);
+if ($archiveManifest != $manifest || $archiveComposer != $composer) {
+    fail('The supplied module metadata differs from the release archive. Update and tag the actual source before publishing.');
+}
+if (($composer['name'] ?? null) !== $manifest['composer_package']
+    || (isset($composer['version']) && $composer['version'] !== $manifest['version'])) {
+    fail('Composer name/version must match module.json.');
 }
 
 foreach (['name', 'alias', 'composer_package', 'version', 'description', 'author', 'license', 'repository', 'homepage'] as $field) {
@@ -30,9 +49,16 @@ foreach (['name', 'alias', 'composer_package', 'version', 'description', 'author
 
 $packageName = (string) $manifest['composer_package'];
 $version = (string) $manifest['version'];
-$repository = rtrim((string) $manifest['repository'], '/');
-$repository = preg_replace('/\.git$/i', '', $repository) ?: $repository;
-$assetUrl = "{$repository}/archive/refs/tags/v{$version}.zip";
+$repository = repository($manifest['repository']);
+$tag = $options['tag'] ?? 'v'.$version;
+if (! in_array($tag, [$version, 'v'.$version], true)) {
+    fail('The release tag must match the manifest version.');
+}
+$sourceRef = $options['source-ref'] ?? null;
+if ($sourceRef !== null && (! is_string($sourceRef) || ! preg_match('/^[a-f0-9]{40}$/D', $sourceRef))) {
+    fail('The source reference must be an immutable Git commit SHA.');
+}
+$assetUrl = $sourceRef !== null ? "{$repository}/archive/{$sourceRef}.zip" : "{$repository}/archive/refs/tags/{$tag}.zip";
 $sha256 = hash_file('sha256', $archivePath);
 $shasum = hash_file('sha1', $archivePath);
 
@@ -47,7 +73,7 @@ $requires['modules'] = is_array($requires['modules'] ?? null) ? $requires['modul
 $releaseRequires = array_filter([
     'core' => $requires['core'] ?? null,
     'php' => $requires['php'] ?? null,
-], static fn (mixed $value): bool => is_string($value) && mb_trim($value) !== '');
+], static fn (mixed $value): bool => is_string($value) && trim($value) !== '');
 
 if ($requires['modules'] !== []) {
     $releaseRequires['modules'] = $requires['modules'];
@@ -60,6 +86,9 @@ $release = [
     'released_at' => (string) $releasedAt,
     'requires' => $releaseRequires,
 ];
+if ($sourceRef !== null) {
+    $release['source_ref'] = $sourceRef;
+}
 
 $module = [
     'name' => $manifest['name'],
@@ -76,11 +105,33 @@ $module = [
     'homepage' => $manifest['homepage'],
     'versions' => [],
 ];
+foreach (['permissions', 'capabilities'] as $field) {
+    if (isset($manifest[$field])) {
+        $module[$field] = $manifest[$field];
+    }
+}
 
 foreach ($registry['modules'] ?? [] as $existingModule) {
     if (is_array($existingModule) && strcasecmp((string) ($existingModule['composer_package'] ?? ''), $packageName) === 0) {
+        if (version_compare((string) $existingModule['version'], $version, '>')) {
+            fail('Refuse to downgrade the current module version. Publish a new version for corrections.');
+        }
         $module['versions'] = is_array($existingModule['versions'] ?? null) ? $existingModule['versions'] : [];
         break;
+    }
+}
+
+foreach ($module['versions'] as $existingRelease) {
+    if (($existingRelease['version'] ?? null) === $version) {
+        if (($existingRelease['sha256'] ?? null) !== $sha256 || ($existingRelease['asset_url'] ?? null) !== $assetUrl
+            || (isset($existingRelease['source_ref']) && $sourceRef !== null && $existingRelease['source_ref'] !== $sourceRef)) {
+            fail("Release [{$packageName} {$version}] changed. Publish a new version instead of replacing an existing release.");
+        }
+        $sourceRef ??= $existingRelease['source_ref'] ?? null;
+        $release['released_at'] = $existingRelease['released_at'];
+        if ($sourceRef !== null) {
+            $release['source_ref'] = $sourceRef;
+        }
     }
 }
 
@@ -99,7 +150,7 @@ $registry['modules'] = array_values(array_filter(
 $registry['modules'][] = $module;
 usort($registry['modules'], static fn (array $first, array $second): int => strcasecmp((string) $first['name'], (string) $second['name']));
 $registry['generated_at'] = gmdate('Y-m-d\TH:i:s\Z');
-unset($registry['signature']);
+unset($registry['signature'], $registry['packages_sha256']);
 
 $packageMetadata = [
     'name' => $packageName,
@@ -113,12 +164,17 @@ $packageMetadata = [
     'source' => [
         'type' => 'git',
         'url' => "{$repository}.git",
-        'reference' => "v{$version}",
+        'reference' => $sourceRef ?? $tag,
     ],
     'require' => is_array($composer['require'] ?? null) ? $composer['require'] : [],
     'autoload' => is_array($composer['autoload'] ?? null) ? $composer['autoload'] : [],
     'extra' => is_array($composer['extra'] ?? null) ? $composer['extra'] : [],
 ];
+foreach (['description', 'license', 'authors', 'homepage', 'support', 'funding', 'suggest', 'conflict', 'replace', 'provide', 'bin'] as $field) {
+    if (isset($composer[$field])) {
+        $packageMetadata[$field] = $composer[$field];
+    }
+}
 
 if (! is_array($packages['packages'] ?? null)) {
     $packages['packages'] = [];
@@ -132,8 +188,7 @@ $packages['packages'][$packageName][$version] = $packageMetadata;
 uksort($packages['packages'], 'strnatcasecmp');
 uksort($packages['packages'][$packageName], static fn (string $first, string $second): int => version_compare($second, $first));
 
-writeJson(__DIR__.'/../registry.json', $registry);
-writeJson(__DIR__.'/../packages.json', $packages);
+writeIndexes($registryPath, $registry, $packagesPath, $packages);
 
 fwrite(STDOUT, "Updated {$packageName} {$version}. The registry signature was removed; sign registry.json before merging.\n");
 
@@ -155,18 +210,9 @@ function readJson(string $path): array
     return $decoded;
 }
 
-function writeJson(string $path, array $payload): void
-{
-    $contents = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR).PHP_EOL;
-
-    if (file_put_contents($path, $contents, LOCK_EX) === false) {
-        fail("Unable to write JSON file [{$path}].");
-    }
-}
-
 function requireString(mixed $value, string $field): void
 {
-    if (! is_string($value) || mb_trim($value) === '') {
+    if (! is_string($value) || trim($value) === '') {
         fail("{$field} must be a non-empty string.");
     }
 }

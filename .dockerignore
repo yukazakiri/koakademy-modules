@@ -1,0 +1,8 @@
+.git
+.github
+.env
+.tmp
+keys
+public
+vendor
+*.local.json

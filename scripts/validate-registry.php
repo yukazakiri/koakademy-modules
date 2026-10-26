@@ -2,6 +2,16 @@
 
 declare(strict_types=1);
 
+use function Koakademy\Registry\constraint;
+use function Koakademy\Registry\httpsUrl;
+use function Koakademy\Registry\manifest;
+use function Koakademy\Registry\releasedAt;
+use function Koakademy\Registry\requirements;
+use function Koakademy\Registry\stringList;
+use function Koakademy\Registry\version;
+
+require_once __DIR__.'/lib/metadata.php';
+
 $registryPath = $argv[1] ?? __DIR__.'/../registry.json';
 $packagesPath = $argv[2] ?? __DIR__.'/../packages.json';
 
@@ -12,17 +22,26 @@ if (($registry['schema'] ?? null) !== 1) {
     fail('The registry schema must be 1.');
 }
 
-if (! is_array($registry['modules'] ?? null)) {
+if (! is_array($registry['modules'] ?? null) || ! array_is_list($registry['modules'])) {
     fail('The registry modules value must be an array.');
 }
 
 $modulesByPackage = [];
 $names = [];
 $aliases = [];
+$identities = [];
 
 foreach ($registry['modules'] as $index => $module) {
     if (! is_array($module)) {
         fail("Registry module [{$index}] must be an object.");
+    }
+    manifest($module);
+    foreach ([$module['name'], $module['alias'], $module['composer_package']] as $identity) {
+        $key = strtolower($identity);
+        if (isset($identities[$key]) && $identities[$key] !== $index) {
+            fail("Duplicate module identity [{$identity}].");
+        }
+        $identities[$key] = $index;
     }
 
     foreach (['name', 'alias', 'composer_package', 'version', 'description', 'author', 'license', 'repository', 'homepage'] as $field) {
@@ -32,8 +51,8 @@ foreach ($registry['modules'] as $index => $module) {
     $name = (string) $module['name'];
     $alias = (string) $module['alias'];
     $composerPackage = (string) $module['composer_package'];
-    $nameKey = mb_strtolower($name);
-    $aliasKey = mb_strtolower($alias);
+    $nameKey = strtolower($name);
+    $aliasKey = strtolower($alias);
 
     if (isset($names[$nameKey])) {
         fail("Duplicate module name [{$name}].");
@@ -59,7 +78,7 @@ foreach ($registry['modules'] as $index => $module) {
         fail("Registry module [{$name}] must declare at least one provider.");
     }
 
-    if (! is_array($module['versions'] ?? null) || $module['versions'] === []) {
+    if (! is_array($module['versions'] ?? null) || ! array_is_list($module['versions']) || $module['versions'] === []) {
         fail("Registry module [{$name}] must declare at least one release.");
     }
 
@@ -75,6 +94,13 @@ foreach ($registry['modules'] as $index => $module) {
         }
 
         $releaseVersion = (string) $release['version'];
+        version($releaseVersion);
+        httpsUrl($release['asset_url']);
+        releasedAt($release['released_at']);
+        requirements($release['requires'] ?? []);
+        if (isset($release['source_ref']) && (! is_string($release['source_ref']) || ! preg_match('/^[a-f0-9]{40}$/D', $release['source_ref']))) {
+            fail('Release source_ref must be an immutable Git commit SHA.');
+        }
 
         if (isset($releaseVersions[$releaseVersion])) {
             fail("Registry module [{$name}] contains duplicate release [{$releaseVersion}].");
@@ -137,6 +163,10 @@ foreach ($packages['packages'] as $composerPackage => $packageVersions) {
         if (! is_array($dist) || ($dist['type'] ?? null) !== 'zip' || ($dist['url'] ?? null) !== $registryReleases[$version]['asset_url']) {
             fail("Composer package [{$composerPackage}] version [{$version}] has inconsistent distribution metadata.");
         }
+        if (isset($registryReleases[$version]['source_ref'])
+            && $dist['url'] !== rtrim($modulesByPackage[$composerPackage]['repository'], '/').'/archive/'.$registryReleases[$version]['source_ref'].'.zip') {
+            fail('Pinned release archives must use the immutable source commit URL.');
+        }
 
         if (! is_string($dist['shasum'] ?? null) || ! preg_match('/^[a-f0-9]{40}$/i', $dist['shasum'])) {
             fail("Composer package [{$composerPackage}] version [{$version}] must contain a SHA-1 distribution checksum.");
@@ -144,8 +174,36 @@ foreach ($packages['packages'] as $composerPackage => $packageVersions) {
 
         $source = $package['source'] ?? null;
 
-        if (! is_array($source) || ($source['reference'] ?? null) !== "v{$version}") {
-            fail("Composer package [{$composerPackage}] version [{$version}] must reference tag [v{$version}].");
+        $reference = is_array($source) ? ($source['reference'] ?? null) : null;
+        $release = $registryReleases[$version];
+        $expectedReferences = isset($release['source_ref']) ? [$release['source_ref']] : ["v{$version}", (string) $version];
+        if (! is_array($source) || ($source['type'] ?? null) !== 'git'
+            || ($source['url'] ?? null) !== rtrim($modulesByPackage[$composerPackage]['repository'], '/').'.git'
+            || ! in_array($reference, $expectedReferences, true)) {
+            fail("Composer package [{$composerPackage}] version [{$version}] has inconsistent source metadata.");
+        }
+        if (! is_array($package['require'] ?? null)) {
+            fail('Composer runtime requirements must be an object.');
+        }
+        foreach ($package['require'] as $dependency => $range) {
+            requireString($dependency, 'Composer dependency');
+            constraint($range);
+        }
+        if (! is_array($package['autoload']['psr-4'] ?? null) || $package['autoload']['psr-4'] === []) {
+            fail('Composer packages must declare PSR-4 autoloading.');
+        }
+        foreach ($package['autoload']['psr-4'] as $namespace => $directories) {
+            requireString($namespace, 'Composer namespace');
+            stringList(is_string($directories) ? [$directories] : $directories, 'Autoload directories', true);
+        }
+        $providers = stringList($package['extra']['laravel']['providers'] ?? null, 'Composer Laravel providers', true);
+        if ((string) $version === $modulesByPackage[$composerPackage]['version']) {
+            $expectedProviders = $modulesByPackage[$composerPackage]['providers'];
+            sort($providers);
+            sort($expectedProviders);
+            if ($providers !== $expectedProviders) {
+                fail('Current manifest providers must match Composer Laravel discovery.');
+            }
         }
     }
 }
@@ -188,7 +246,7 @@ function readJson(string $path): array
 
 function requireString(mixed $value, string $field): void
 {
-    if (! is_string($value) || mb_trim($value) === '') {
+    if (! is_string($value) || trim($value) === '') {
         fail("{$field} must be a non-empty string.");
     }
 }

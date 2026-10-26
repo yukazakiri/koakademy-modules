@@ -8,6 +8,8 @@ on:
             - 'packages.json'
             - 'registry-public-key.txt'
             - 'scripts/**'
+            - 'composer.json'
+            - 'composer.lock'
             - '.github/workflows/pages.yml'
     workflow_dispatch:
 
@@ -22,16 +24,20 @@ jobs:
     build:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
-            - uses: shivammathur/setup-php@v2
+            - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+              with:
+                  persist-credentials: false
+            - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
               with:
                   php-version: '8.5'
                   extensions: sodium
                   coverage: none
+                  tools: composer:v2
+            - run: composer install --no-dev --no-interaction --prefer-dist --no-progress
             - run: php scripts/validate-registry.php
             - run: php scripts/verify-registry.php
             - run: mkdir -p dist && cp registry.json packages.json registry-public-key.txt dist/
-            - uses: actions/upload-pages-artifact@v3
+            - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
               with:
                   path: dist
 
@@ -46,4 +52,4 @@ jobs:
             url: ${{ steps.deployment.outputs.page_url }}
         steps:
             - id: deployment
-              uses: actions/deploy-pages@v4
+              uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4

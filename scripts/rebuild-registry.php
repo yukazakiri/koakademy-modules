@@ -2,114 +2,164 @@
 
 declare(strict_types=1);
 
-$configPath = realpath($argv[1] ?? __DIR__.'/../modules.json');
+use function Koakademy\Registry\archiveMetadata;
+use function Koakademy\Registry\repository;
+use function Koakademy\Registry\writeIndexes;
 
-if ($configPath === false || ! is_file($configPath)) {
-    fail("Module registry config [{$configPath}] does not exist.");
-}
+require_once __DIR__.'/lib/metadata.php';
 
-$config = readJson($configPath);
-$modules = $config['modules'] ?? null;
+/** Callbacks let the regression suite replay GitHub responses without network access. */
+function rebuild(array $argv, ?Closure $fetch = null, ?Closure $downloadArchive = null): void
+{
+    $configPath = realpath($argv[1] ?? __DIR__.'/../modules.json');
 
-if (! is_array($modules) || ! array_is_list($modules) || $modules === []) {
-    fail('modules.json must contain a non-empty "modules" list.');
-}
-
-$registryPath = realpath(__DIR__.'/../registry.json');
-$packagesPath = realpath(__DIR__.'/../packages.json');
-
-if ($registryPath === false || $packagesPath === false) {
-    fail('registry.json and packages.json must exist before rebuilding.');
-}
-
-$beforeRegistry = (string) file_get_contents($registryPath);
-$beforePackages = (string) file_get_contents($packagesPath);
-$beforeHash = meaningfulHash($registryPath, $packagesPath);
-
-$tempRoot = sys_get_temp_dir().DIRECTORY_SEPARATOR.'koakademy-registry-'.bin2hex(random_bytes(6));
-
-if (! mkdir($tempRoot, 0770, true) && ! is_dir($tempRoot)) {
-    fail("Unable to create temporary directory [{$tempRoot}].");
-}
-
-$rebuilt = [];
-
-try {
-    foreach ($modules as $index => $module) {
-        if (! is_array($module) || ! is_string($module['repository'] ?? null)) {
-            fail("modules.json entry [{$index}] must declare a repository string.");
-        }
-
-        $repository = rtrim((string) $module['repository'], '/');
-        [$owner, $repo] = ownerAndRepo($repository);
-        $release = latestRelease($owner, $repo);
-        $tag = (string) $release['tag'];
-        $version = preg_replace('/^v(?=\d)/i', '', $tag) ?? $tag;
-
-        if (! preg_match('/^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/', $version)) {
-            fail("Repository [{$repository}] latest tag [{$tag}] is not a valid semantic version.");
-        }
-
-        $zipPath = $tempRoot.DIRECTORY_SEPARATOR.$repo.'-'.$tag.'.zip';
-        $extractRoot = $tempRoot.DIRECTORY_SEPARATOR.$repo;
-
-        download("{$repository}/archive/refs/tags/{$tag}.zip", $zipPath);
-        extractZip($zipPath, $extractRoot);
-        $modulePath = locateModulePath($extractRoot);
-        normalizeModuleVersion($modulePath, $version);
-        $releasedAt = is_string($release['released_at'] ?? null) ? $release['released_at'] : gmdate('Y-m-d\TH:i:s\Z');
-
-        $command = escapeshellarg(PHP_BINARY)
-            .' '.escapeshellarg(__DIR__.'/update-module.php')
-            .' --module='.escapeshellarg($modulePath)
-            .' --archive='.escapeshellarg($zipPath)
-            .' --released-at='.escapeshellarg($releasedAt);
-
-        passthru($command, $exitCode);
-
-        if ($exitCode !== 0) {
-            fail("update-module.php failed for [{$repository}] with exit code [{$exitCode}].");
-        }
-
-        $rebuilt[] = "{$owner}/{$repo} {$version} ({$tag})";
-    }
-} finally {
-    removeDirectory($tempRoot);
-}
-
-if (meaningfulHash($registryPath, $packagesPath) === $beforeHash) {
-    if (file_put_contents($registryPath, $beforeRegistry, LOCK_EX) === false
-        || file_put_contents($packagesPath, $beforePackages, LOCK_EX) === false) {
-        fail('Unable to restore the unchanged registry files.');
+    if ($configPath === false || ! is_file($configPath)) {
+        fail("Module registry config [{$configPath}] does not exist.");
     }
 
-    fwrite(STDOUT, "No changes. Registry is already up to date.".PHP_EOL);
-} else {
-    fwrite(STDOUT, 'Rebuilt '.count($rebuilt).' module(s):'.PHP_EOL);
+    $config = readJson($configPath);
+    $modules = $config['modules'] ?? null;
 
-    foreach ($rebuilt as $line) {
-        fwrite(STDOUT, "  - {$line}".PHP_EOL);
+    if (($config['schema'] ?? null) !== 1 || ! is_array($modules) || ! array_is_list($modules) || $modules === []) {
+        fail('modules.json must contain a non-empty "modules" list.');
+    }
+
+    $registryPath = realpath($argv[2] ?? __DIR__.'/../registry.json');
+    $packagesPath = realpath($argv[3] ?? __DIR__.'/../packages.json');
+
+    if ($registryPath === false || $packagesPath === false) {
+        fail('registry.json and packages.json must exist before rebuilding.');
+    }
+
+    $beforeHash = meaningfulHash($registryPath, $packagesPath);
+
+    $tempRoot = sys_get_temp_dir().DIRECTORY_SEPARATOR.'koakademy-registry-'.bin2hex(random_bytes(6));
+
+    if (! mkdir($tempRoot, 0770, true) && ! is_dir($tempRoot)) {
+        fail("Unable to create temporary directory [{$tempRoot}].");
+    }
+
+    $rebuilt = [];
+    $repositories = [];
+    $stagedRegistry = $tempRoot.'/registry.json';
+    $stagedPackages = $tempRoot.'/packages.json';
+    if (! copy($registryPath, $stagedRegistry) || ! copy($packagesPath, $stagedPackages)) {
+        removeDirectory($tempRoot);
+        fail('Unable to stage the current indexes.');
+    }
+
+    try {
+        foreach ($modules as $index => $module) {
+            if (! is_array($module) || ! is_string($module['repository'] ?? null)) {
+                fail("modules.json entry [{$index}] must declare a repository string.");
+            }
+
+            $repository = repository($module['repository']);
+            if (isset($repositories[strtolower($repository)])) {
+                fail("Duplicate repository [{$repository}] in modules.json.");
+            }
+            $repositories[strtolower($repository)] = true;
+            [$owner, $repo] = ownerAndRepo($repository);
+            $release = latestRelease($owner, $repo, $fetch);
+            $tag = (string) $release['tag'];
+            $version = preg_replace('/^v(?=\d)/i', '', $tag) ?? $tag;
+
+            foreach (readJson($stagedRegistry)['modules'] as $existing) {
+                if (repository($existing['repository']) !== $repository) {
+                    continue;
+                }
+                if (version_compare($existing['version'], $version, '>')) {
+                    fail('Refuse to downgrade a catalog entry because a newer upstream tag disappeared.');
+                }
+                foreach ($existing['versions'] as $known) {
+                    if ($known['version'] !== $version) {
+                        continue;
+                    }
+                    if (isset($known['source_ref']) && $known['source_ref'] !== $release['source_ref']) {
+                        fail("Release tag [{$tag}] moved to another commit. Publish a new version.");
+                    }
+                    // Historical tag archives retain their reviewed metadata and checksums.
+                    // New releases are downloaded and recorded using the immutable commit.
+                    continue 3;
+                }
+            }
+
+            if (! preg_match('/^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/', $version)) {
+                fail("Repository [{$repository}] latest tag [{$tag}] is not a valid semantic version.");
+            }
+
+            $zipPath = $tempRoot.DIRECTORY_SEPARATOR.$repo.'-'.$tag.'.zip';
+            ($downloadArchive ?? download(...))("{$repository}/archive/{$release['source_ref']}.zip", $zipPath);
+            [$manifest, $composer] = archiveMetadata($zipPath);
+            if (($manifest['version'] ?? null) !== $version || repository($manifest['repository'] ?? null) !== $repository) {
+                fail("Repository [{$repository}] archive identity/version does not match tag [{$tag}]. Fix the source and publish a new tag.");
+            }
+            $modulePath = $tempRoot.'/module-'.$index;
+            if (! mkdir($modulePath, 0770)) {
+                fail('Unable to stage module metadata.');
+            }
+            foreach (['module.json' => $manifest, 'composer.json' => $composer] as $file => $data) {
+                if (file_put_contents($modulePath.'/'.$file, json_encode($data, JSON_THROW_ON_ERROR)) === false) {
+                    fail('Unable to write staged module metadata.');
+                }
+            }
+            $releasedAt = is_string($release['released_at'] ?? null) ? $release['released_at'] : gmdate('Y-m-d\TH:i:s\Z');
+
+            $command = escapeshellarg(PHP_BINARY)
+                .' '.escapeshellarg(__DIR__.'/update-module.php')
+                .' --module='.escapeshellarg($modulePath)
+                .' --archive='.escapeshellarg($zipPath)
+                .' --released-at='.escapeshellarg($releasedAt)
+                .' --tag='.escapeshellarg($tag)
+                .' --source-ref='.escapeshellarg($release['source_ref'])
+                .' --registry='.escapeshellarg($stagedRegistry)
+                .' --packages='.escapeshellarg($stagedPackages);
+
+            passthru($command, $exitCode);
+
+            if ($exitCode !== 0) {
+                fail("update-module.php failed for [{$repository}] with exit code [{$exitCode}].");
+            }
+
+            $rebuilt[] = "{$owner}/{$repo} {$version} ({$tag})";
+        }
+        if (meaningfulHash($stagedRegistry, $stagedPackages) === $beforeHash) {
+            fwrite(STDOUT, 'No changes. Registry is already up to date.'.PHP_EOL);
+        } else {
+            writeIndexes($registryPath, readJson($stagedRegistry), $packagesPath, readJson($stagedPackages));
+            fwrite(STDOUT, 'Rebuilt '.count($rebuilt).' module(s):'.PHP_EOL);
+            foreach ($rebuilt as $line) {
+                fwrite(STDOUT, "  - {$line}".PHP_EOL);
+            }
+        }
+    } finally {
+        removeDirectory($tempRoot);
     }
 }
 
 /**
- * @return array{tag: string, released_at: ?string}
+ * @return array{tag: string, source_ref: string, released_at: ?string}
  */
-function latestRelease(string $owner, string $repo): array
+function latestRelease(string $owner, string $repo, ?Closure $fetch = null): array
 {
-    $tags = apiGet("/repos/{$owner}/{$repo}/tags");
-
-    if (! is_array($tags)) {
-        fail("Unable to list tags for [{$owner}/{$repo}].");
-    }
-
+    $fetch ??= apiGet(...);
     $versions = [];
-
-    foreach ($tags as $tag) {
-        $name = $tag['name'] ?? null;
-
-        if (is_string($name) && preg_match('/^v?\d+\.\d+\.\d+$/', $name) === 1) {
-            $versions[] = preg_replace('/^v/i', '', $name);
+    for ($page = 1; $page <= 100; $page++) {
+        $tags = $fetch("/repos/{$owner}/{$repo}/tags?per_page=100&page={$page}");
+        if (! is_array($tags) || ! array_is_list($tags)) {
+            fail("Unable to list tags for [{$owner}/{$repo}].");
+        }
+        foreach ($tags as $tag) {
+            $name = $tag['name'] ?? null;
+            if (is_string($name) && preg_match('/^v?\d+\.\d+\.\d+$/D', $name) === 1) {
+                $versions[] = $name;
+            }
+        }
+        if (count($tags) < 100) {
+            break;
+        }
+        if ($page === 100) {
+            fail('Tag listing exceeded 10,000 entries; refuse an incomplete release selection.');
         }
     }
 
@@ -117,38 +167,19 @@ function latestRelease(string $owner, string $repo): array
         fail("Repository [{$owner}/{$repo}] has no semantic version tags.");
     }
 
-    usort($versions, static fn (string $first, string $second): int => version_compare($second, $first));
-
-    $tag = 'v'.$versions[0];
+    usort($versions, static fn (string $first, string $second): int => version_compare(ltrim($second, 'v'), ltrim($first, 'v')) ?: strcmp($second, $first));
+    $tag = $versions[0];
+    $commit = $fetch("/repos/{$owner}/{$repo}/commits/{$tag}");
+    if (! is_string($commit['sha'] ?? null) || ! preg_match('/^[a-f0-9]{40}$/D', $commit['sha'])) {
+        fail('The selected release could not be resolved to an immutable commit.');
+    }
 
     return [
         'tag' => $tag,
-        'released_at' => releasePublishedAt($owner, $repo, $tag) ?? tagCommitDate($owner, $repo, $tag),
+        'source_ref' => $commit['sha'],
+        'released_at' => ($fetch("/repos/{$owner}/{$repo}/releases/tags/{$tag}")['published_at'] ?? null)
+            ?? $commit['commit']['committer']['date'] ?? $commit['commit']['author']['date'] ?? null,
     ];
-}
-
-function releasePublishedAt(string $owner, string $repo, string $tag): ?string
-{
-    $release = apiGet("/repos/{$owner}/{$repo}/releases/tags/{$tag}");
-
-    if (! is_array($release) || ! is_string($release['published_at'] ?? null)) {
-        return null;
-    }
-
-    return $release['published_at'];
-}
-
-function tagCommitDate(string $owner, string $repo, string $tag): ?string
-{
-    $commit = apiGet("/repos/{$owner}/{$repo}/commits/{$tag}");
-
-    if (! is_array($commit)) {
-        return null;
-    }
-
-    $date = $commit['commit']['committer']['date'] ?? $commit['commit']['author']['date'] ?? null;
-
-    return is_string($date) ? $date : null;
 }
 
 /**
@@ -228,71 +259,12 @@ function ownerAndRepo(string $repository): array
 
 function download(string $url, string $destination): void
 {
-    $contents = @file_get_contents($url);
+    $contents = @file_get_contents($url, false, stream_context_create(['http' => ['timeout' => 30, 'user_agent' => 'koakademy-modules-registry']]));
 
     if ($contents === false || @file_put_contents($destination, $contents) === false) {
         fail("Unable to download release archive [{$url}].");
     }
 }
-
-function extractZip(string $zipPath, string $destination): void
-{
-    if (! mkdir($destination, 0770, true) && ! is_dir($destination)) {
-        fail("Unable to create extraction directory [{$destination}].");
-    }
-
-    $zip = new \ZipArchive;
-
-    if ($zip->open($zipPath) !== true) {
-        fail("Unable to open release archive [{$zipPath}].");
-    }
-
-    if (! $zip->extractTo($destination)) {
-        $zip->close();
-        fail("Unable to extract release archive [{$zipPath}].");
-    }
-
-    $zip->close();
-}
-
-function locateModulePath(string $root): string
-{
-    $iterator = new \RecursiveIteratorIterator(
-        new \RecursiveDirectoryIterator($root, \FilesystemIterator::SKIP_DOTS),
-        \RecursiveIteratorIterator::LEAVES_ONLY,
-    );
-
-    foreach ($iterator as $file) {
-        if ($file->isFile() && $file->getFilename() === 'module.json') {
-            $directory = $file->getPath();
-
-            if (is_file($directory.DIRECTORY_SEPARATOR.'composer.json')) {
-                return $directory;
-            }
-        }
-    }
-
-    fail("Extracted archive [{$root}] does not contain module.json and composer.json.");
-}
-function normalizeModuleVersion(string $modulePath, string $version): void
-{
-    $manifestPath = $modulePath.DIRECTORY_SEPARATOR.'module.json';
-
-    if (! is_file($manifestPath)) {
-        fail("Module manifest [{$manifestPath}] does not exist.");
-    }
-
-    $manifest = readJson($manifestPath);
-    $manifest['version'] = $version;
-
-    $contents = json_encode($manifest, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR).PHP_EOL;
-
-    if (file_put_contents($manifestPath, $contents, LOCK_EX) === false) {
-        fail("Unable to write module manifest [{$manifestPath}].");
-    }
-}
-
-
 
 function removeDirectory(string $path): void
 {
@@ -337,7 +309,7 @@ function readJson(string $path): array
 function meaningfulHash(string $registryPath, string $packagesPath): string
 {
     $registry = readJson($registryPath);
-    unset($registry['generated_at'], $registry['signature']);
+    unset($registry['generated_at'], $registry['signature'], $registry['packages_sha256']);
 
     $payload = json_encode(
         ['registry' => $registry, 'packages' => readJson($packagesPath)],
@@ -349,7 +321,15 @@ function meaningfulHash(string $registryPath, string $packagesPath): string
 
 function fail(string $message): never
 {
-    fwrite(STDERR, "Registry rebuild failed: {$message}\n");
-    exit(1);
+    throw new RuntimeException("Registry rebuild failed: {$message}");
 }
 
+
+if (realpath($_SERVER['SCRIPT_FILENAME'] ?? '') === __FILE__) {
+    try {
+        rebuild($argv);
+    } catch (Throwable $exception) {
+        fwrite(STDERR, $exception->getMessage().PHP_EOL);
+        exit(1);
+    }
+}

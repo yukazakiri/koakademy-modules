@@ -1,12 +1,15 @@
 FROM php:8.5-cli-alpine
 
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
+
 WORKDIR /app
 
 COPY . /app
 
-RUN mkdir -p /app/public /data/keys \
+RUN composer install --no-dev --no-interaction --no-scripts --prefer-dist --no-progress \
+    && mkdir -p /app/public /data/keys \
     && cp packages.json /app/public/packages.json \
-    && cp registry-public-key.txt /app/public/registry-public-key.txt 2>/dev/null || true
+    && cp registry-public-key.txt /app/public/registry-public-key.txt
 
 VOLUME ["/data"]
 

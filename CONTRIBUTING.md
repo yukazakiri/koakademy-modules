@@ -20,6 +20,9 @@ A module repository must provide:
 - A public semver Git tag whose name is `v` followed by the manifest version.
   For example, manifest `1.2.3` must be released as tag `v1.2.3`.
 - A passing module CI workflow before the registry pull request is opened.
+- Evidence from a compatible Koakademy host showing navigation, authorization,
+  tenant isolation, migrations, and disabled-module behavior. Use the
+  [extension starter](https://github.com/yukazakiri/koakademy/pull/486) as a workbench.
 
 Keep the module’s provider class and Composer package name stable after the
 first public release. Changing either one can make an installed module look
@@ -27,9 +30,16 @@ like a different package or prevent an existing application from booting.
 
 ## Contributor workflow
 
-Registry metadata is rebuilt automatically by `.github/workflows/rebuild.yml`
-from the repositories listed in `modules.json`. The manual commands below are
-for one-off or local changes only; normal releases no longer require them.
+Submit a PR adding your public GitHub repository to the `modules.json` allowlist.
+After the allowlist is reviewed, `.github/workflows/rebuild.yml` discovers new
+stable releases and proposes unsigned catalog PRs. Every release still needs
+maintainer review; discovery is not approval. The job leaves a pending generated
+PR unchanged so its reviewed artifacts cannot be overwritten by the next run.
+
+The manual commands below support local proposals. Install dependencies first
+with `composer install`; PHP 8.5 with Sodium and ZIP is required. Check out the
+exact tagged module commit before running the updater. Do not pass a different
+checkout's metadata alongside a release ZIP.
 
 
 Run these commands from a clean checkout of this registry repository after
@@ -38,12 +48,15 @@ the module release has been tagged:
 ```sh
 MODULE_REPO="https://github.com/OWNER/REPOSITORY"
 MODULE_VERSION="1.2.3"
-curl -L "$MODULE_REPO/archive/refs/tags/v$MODULE_VERSION.zip" \
+MODULE_COMMIT="$(git -C /path/to/module-repository rev-parse "v$MODULE_VERSION^{commit}")"
+curl --fail --location "$MODULE_REPO/archive/$MODULE_COMMIT.zip" \
     -o "/tmp/module-v$MODULE_VERSION.zip"
 
 php scripts/update-module.php \
     --module=/path/to/module-repository \
-    --archive="/tmp/module-v$MODULE_VERSION.zip"
+    --archive="/tmp/module-v$MODULE_VERSION.zip" \
+    --tag="v$MODULE_VERSION" \
+    --source-ref="$MODULE_COMMIT"
 php scripts/validate-registry.php
 ```
 
@@ -52,13 +65,16 @@ On Windows PowerShell, the download equivalent is:
 ```powershell
 $moduleRepo = 'https://github.com/OWNER/REPOSITORY'
 $moduleVersion = '1.2.3'
+$moduleCommit = git -C 'C:\path\to\module-repository' rev-parse "v$moduleVersion^{commit}"
 Invoke-WebRequest `
-    -Uri "$moduleRepo/archive/refs/tags/v$moduleVersion.zip" `
+    -Uri "$moduleRepo/archive/$moduleCommit.zip" `
     -OutFile "$env:TEMP/module-v$moduleVersion.zip"
 
 php scripts/update-module.php `
     --module='C:\path\to\module-repository' `
-    --archive="$env:TEMP/module-v$moduleVersion.zip"
+    --archive="$env:TEMP/module-v$moduleVersion.zip" `
+    --tag="v$moduleVersion" `
+    --source-ref="$moduleCommit"
 php scripts/validate-registry.php
 ```
 
@@ -68,6 +84,12 @@ commit a private key. Commit the generated `registry.json` and
 `packages.json`, include the module repository/tag in the pull request, and
 explain any migrations or compatibility changes.
 
+The updater rejects mismatched Composer identities/providers, invalid dependency
+constraints, unsafe archives, changed existing releases, and version downgrades.
+It preserves `permissions`, `capabilities`, and Composer license metadata.
+Declare additional frontend dependencies as a reviewed host lockfile change;
+a package-local `package.json` does not install dependencies in the host image.
+
 ## Maintainer merge workflow
 
 After reviewing the module repository, the maintainer runs the following with
@@ -75,6 +97,8 @@ the existing private key loaded from a protected workstation, secret store,
 or persistent registry deployment volume:
 
 ```sh
+composer lint
+composer test
 php scripts/validate-registry.php
 php scripts/sign-registry.php \
     registry.json \
@@ -83,6 +107,18 @@ php scripts/sign-registry.php \
 php scripts/validate-registry.php
 php scripts/verify-registry.php
 ```
+
+Review the exact `source_ref`, matching archive checksums, passing module CI and
+host integration evidence, database migrations, requested permissions and
+capabilities, npm dependencies, and rollback behavior before signing. Signing
+binds `packages.json` through `packages_sha256`; regenerate and resign together
+if either index changes. Keep the committed public key unchanged.
+
+Push the signed commit with maintainer credentials to trigger PR checks.
+Generated PRs created by `GITHUB_TOKEN` do not automatically start other
+workflows; Registry CI also supports manual dispatch on the generated branch.
+Do not merge an unsigned catalog. This repository does not provide a hosted
+signing service or require a private signing secret in discovery/validation CI.
 
 The private key must never be committed, pasted into an issue, or stored in a
 module repository. The public key is the trust root for existing KoAkademy
@@ -103,6 +139,7 @@ After the signed change is merged to `master`:
 
 - [ ] The module repository has a public `vX.Y.Z` tag matching `module.json`.
 - [ ] The module CI checks pass.
+- [ ] A compatible host integration run passes and the exact source commit is recorded.
 - [ ] `php scripts/update-module.php` generated both registry indexes.
 - [ ] `php scripts/validate-registry.php` passes locally.
 - [ ] The pull request does not contain a private signing key.
