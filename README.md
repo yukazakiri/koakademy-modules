@@ -3,7 +3,8 @@
 This repository publishes `registry.json`, the signed Marketplace catalog.
 Public Composer packages are distributed through [Packagist](https://packagist.org/).
 The generated `packages.json` remains available as a legacy Composer index for
-existing installations and is still bound to the catalog signature.
+existing installations. Newly signed catalogs bind its exact bytes; historical
+signatures may predate that binding.
 
 After a public release is available on Packagist, install it in a compatible host:
 
