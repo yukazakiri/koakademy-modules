@@ -30,7 +30,11 @@ like a different package or prevent an existing application from booting.
 
 ## Contributor workflow
 
-Submit a PR adding your public GitHub repository to the `modules.json` allowlist.
+1. Use a Composer vendor namespace you control. The `koakademy` namespace requires its existing maintainer's authorization. Ensure `composer.json`'s `name` matches `module.json`'s `composer_package`, and run `composer validate --strict` plus package and host integration tests.
+2. Tag `vX.Y.Z` matching the `module.json` version. [Submit the public repository to Packagist](https://packagist.org/packages/submit), configure GitHub synchronization, and verify the package, version, and source commit are visible there.
+3. Submit a PR adding your public GitHub repository to the `modules.json` allowlist. Include the Packagist link, release and commit, CI results, compatibility, migrations, permissions, and rollback notes.
+
+Packagist distribution and the Marketplace catalog are separate. Maintainers must manually verify that Packagist exposes the same version and source commit as the proposed listing; the registry builder does not check Packagist.
 After the allowlist is reviewed, `.github/workflows/rebuild.yml` discovers new
 stable releases and proposes unsigned catalog PRs. Every release still needs
 maintainer review; discovery is not approval. The job leaves a pending generated
@@ -131,13 +135,14 @@ After the signed change is merged to `master`:
 
 - Registry CI validates structure and signature.
 - GitHub Pages publishes the signed catalog and Composer metadata.
-- Composer can resolve the new package version from the registry.
+- Packagist makes the separately published package available to Composer; the legacy index remains available to existing clients.
 - The KoAkademy repository must update its package requirement/lockfile and
   build a new image before deployed containers receive the code.
 
 ## Pull request checklist
 
 - [ ] The module repository has a public `vX.Y.Z` tag matching `module.json`.
+- [ ] Packagist exposes the same package name, version, and source commit.
 - [ ] The module CI checks pass.
 - [ ] A compatible host integration run passes and the exact source commit is recorded.
 - [ ] `php scripts/update-module.php` generated both registry indexes.
@@ -150,7 +155,7 @@ After the signed change is merged to `master`:
 ## Updating an existing module
 
 Use the same process for every new version. For example, after releasing
-`koakademy/announcement` `1.0.2`, update the registry and then update the
+`koakademy/announcement` `1.1.0`, verify Packagist, update the registry, and then update the
 KoAkademy application:
 
 ```sh
@@ -171,7 +176,7 @@ If the package is not yet declared by the application, use a first-install
 command instead of `composer update`:
 
 ```sh
-composer require koakademy/announcement:^1.0.2
+composer require koakademy/announcement:^1.1
 ```
 
 Only use the update command after the package is present in the application’s

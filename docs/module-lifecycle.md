@@ -8,7 +8,8 @@ updated.
 | Layer | Purpose | How it changes |
 | --- | --- | --- |
 | Module repository | Source code, tests, migrations, and release tags | Maintainer merges code and creates `vX.Y.Z` |
-| Registry | Signed catalog plus Composer metadata | Maintainer runs the updater, signs, and merges `master` |
+| Packagist | Public Composer package metadata and release source | Publisher submits the repository and verifies tag synchronization |
+| Registry | Signed Marketplace catalog and legacy Composer metadata | Maintainer reviews, signs, and merges `master` |
 | KoAkademy application | Declared package versions in `composer.json` and `composer.lock` | Application maintainer runs Composer and commits the lockfile |
 | Container/Swarm | Built PHP/JS code and database state | Deployment builds a new image, migrates, and rolls replicas |
 
@@ -23,7 +24,8 @@ application image.
 2. Update `module.json` to the new semver version and update migrations,
    permissions, compatibility requirements, and changelog information.
 3. Create and push the matching tag, for example `v1.2.3`.
-4. The registry rebuild workflow detects the new tag automatically, either on
+4. Submit the public repository to [Packagist](https://packagist.org/packages/submit) and verify that the exact package name, version, and source commit are visible. Publication and Marketplace approval are separate.
+5. The registry rebuild workflow detects the new tag automatically, either on
    its daily schedule or via a `module-released` dispatch from the module
    repository. No manual metadata edit is required; `scripts/rebuild-registry.php`
    resolves a new tag to its immutable commit, downloads that commit's archive,
@@ -31,9 +33,9 @@ application image.
    the release. Mismatches fail rather than being normalized. Already listed
    historical releases retain their original archives and metadata.
 
-5. The workflow opens an unsigned pull request and leaves it untouched while
+6. The workflow opens an unsigned pull request and leaves it untouched while
    it awaits review. A maintainer reviews the exact `source_ref`, passing module
-   and host CI, migrations, permissions, frontend dependencies, and rollback
+   and host CI, the matching Packagist package/version/source commit, migrations, permissions, frontend dependencies, and rollback
    impact, then signs with the persistent Ed25519 private key and verifies it:
 
    ```sh
@@ -43,18 +45,19 @@ application image.
    ```
 
    Signing also binds the exact `packages.json` bytes through `packages_sha256`.
+   The builder does not check Packagist; verification is a manual review step.
    The discovery workflow never receives the private key. Push the signed commit
    with maintainer credentials to trigger PR CI, or manually dispatch Registry CI
    on the generated branch; `GITHUB_TOKEN` PR creation does not trigger other
    workflows automatically.
 
-6. Merge to `master`. Registry CI and the Pages workflow validate the signed
+7. Merge to `master`. Registry CI and the Pages workflow validate the signed
    files before the public catalog is published.
 
 ## Installing or updating it in KoAkademy
 
 The KoAkademy application owns the version that actually runs. After the
-registry release is public, update the application repository:
+package release is visible on Packagist and the catalog release is public, update the application repository:
 
 ```sh
 composer update koakademy/announcement --with-dependencies
@@ -65,7 +68,7 @@ git push
 ```
 
 If the application does not declare the package yet, use
-`composer require koakademy/announcement:^1.0.2` to add it and generate the
+`composer require koakademy/announcement:^1.1` to add it and generate the
 lockfile. Do not run `composer update` for a package that is not in the
 application’s requirements.
 

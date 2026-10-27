@@ -1,15 +1,14 @@
 # KoAkademy Module Registry
 
-This repository publishes two read-only distribution indexes:
+This repository publishes `registry.json`, the signed Marketplace catalog.
+Public Composer packages are distributed through [Packagist](https://packagist.org/).
+The generated `packages.json` remains available as a legacy Composer index for
+existing installations and is still bound to the catalog signature.
 
-- `registry.json` - a signed KoAkademy module catalog consumed by the core app.
-- `packages.json` - a Composer repository containing the same tagged packages.
-
-The standalone packages are:
+After a public release is available on Packagist, install it in a compatible host:
 
 ```sh
-composer config repositories.koakademy composer https://yukazakiri.github.io/koakademy-modules
-composer require koakademy/announcement:^1.0
+composer require koakademy/forms:^1.10
 ```
 
 The registry is metadata and distribution infrastructure. It does not execute
@@ -23,7 +22,10 @@ catalog entry and controls whether that installed module is enabled.
 Start with a standalone module repository containing a `module.json`, a
 Composer package, a Laravel service provider, tests, and a semver tag matching
 the manifest version (`v1.2.3` for `1.2.3`). The registry discovers releases
-from the module repositories listed in `modules.json`.
+from the module repositories listed in `modules.json`. Publish the tagged
+package on Packagist and verify its package name, version, and source commit
+before proposing its Marketplace listing. Publishing to Packagist does not
+automatically add or approve a catalog entry.
 
 Use the [Koakademy extension starter and SDK](https://github.com/yukazakiri/koakademy/pull/486)
 for a working package, tenant policies, permissions, frontend integration, and
@@ -44,7 +46,10 @@ job has no private signing key and does not sign or push releases directly to `m
 An existing generated PR is left untouched while it awaits review. GitHub must
 allow Actions to create pull requests; the job uses its built-in `GITHUB_TOKEN`.
 
-To add a module, submit a PR adding its repository to `modules.json`. Later tags
+To add a module, submit a PR adding its repository to `modules.json` with the
+Packagist link, release, CI evidence, compatibility, migrations, permissions,
+and rollback notes. Maintainers must manually verify that Packagist exposes the
+same release and source commit; the builder does not check Packagist. Later tags
 are discovered without repeated allowlist edits, but every changed catalog still
 requires release review and signing. PRs created with `GITHUB_TOKEN` do not start
 other Actions workflows: push the reviewed, signed commit with maintainer
@@ -105,7 +110,7 @@ after dependencies are installed. PHP 8.5 with Sodium and ZIP is required.
 The complete release and container update sequence is documented in
 [`docs/module-lifecycle.md`](docs/module-lifecycle.md). In short:
 
-1. Release a new module tag.
+1. Release a new module tag and verify that version and commit on Packagist.
 2. The registry rebuild workflow detects the release.
 3. A maintainer reviews the exact source commit, module and host CI, permissions,
    migrations, frontend dependencies, and rollback impact, then signs and merges.
@@ -134,7 +139,7 @@ the HTTPS `registry.json` endpoint.
 docker compose -f docker-compose.yml up --build
 ```
 
-The container serves the Composer repository on port `8080` and persists keys
+The container serves the catalog and legacy Composer index on port `8080` and persists keys
 in the `registry-data` volume.
 
 ## Maintainer references
