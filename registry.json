@@ -1,6 +1,6 @@
 {
     "schema": 1,
-    "generated_at": "2026-11-24T06:22:20Z",
+    "generated_at": "2026-11-24T09:00:23Z",
     "modules": [
         {
             "name": "Announcement",
@@ -454,7 +454,7 @@
             "name": "LibrarySystem",
             "alias": "library-system",
             "composer_package": "koakademy/library-system",
-            "version": "1.2.0",
+            "version": "1.4.0",
             "description": "Library catalogue, borrowing, research papers, and rights-cleared digital editions.",
             "author": "KoAkademy contributors",
             "license": "AGPL-3.0-or-later",
@@ -473,6 +473,17 @@
             "repository": "https://github.com/yukazakiri/koakademy-module-library-system",
             "homepage": "https://github.com/yukazakiri/koakademy-module-library-system",
             "versions": [
+                {
+                    "version": "1.4.0",
+                    "asset_url": "https://github.com/yukazakiri/koakademy-module-library-system/archive/02a5f66841264f5e4d1cef115c3e0685f50de659.zip",
+                    "sha256": "66e5f5e0aeaddca18a11deaaac991afcbbbd8a1b6401876385c2d4d209730ca8",
+                    "released_at": "2026-11-24T07:18:12Z",
+                    "requires": {
+                        "core": ">=1.29.0",
+                        "php": ">=8.5.12 <8.6"
+                    },
+                    "source_ref": "02a5f66841264f5e4d1cef115c3e0685f50de659"
+                },
                 {
                     "version": "1.2.0",
                     "asset_url": "https://github.com/yukazakiri/koakademy-module-library-system/archive/d16cf1cf7645cb66cc49e497a23915fdb12b481d.zip",
@@ -659,10 +670,5 @@
                 }
             ]
         }
-    ],
-    "packages_sha256": "5b897abc0a15777206d9204080d8422fb3dd1d74c80bbfe176cbc2fb1de902ae",
-    "signature": {
-        "algorithm": "ed25519",
-        "value": "_rcwWqeQfLRnYsbV-UChko_UaTAgLhDf2gf1gAnnvYcPF_lAy0H1Xebsyq4GzpHLchmZiJRlM54-bpvL4dnhBg"
-    }
+    ]
 }
