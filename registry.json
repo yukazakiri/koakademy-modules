@@ -659,5 +659,10 @@
                 }
             ]
         }
-    ]
+    ],
+    "packages_sha256": "5b897abc0a15777206d9204080d8422fb3dd1d74c80bbfe176cbc2fb1de902ae",
+    "signature": {
+        "algorithm": "ed25519",
+        "value": "_rcwWqeQfLRnYsbV-UChko_UaTAgLhDf2gf1gAnnvYcPF_lAy0H1Xebsyq4GzpHLchmZiJRlM54-bpvL4dnhBg"
+    }
 }
