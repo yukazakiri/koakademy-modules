@@ -23,6 +23,9 @@
             "repository": "https://github.com/yukazakiri/koakademy-module-notification-center"
         },
         {
+            "repository": "https://github.com/yukazakiri/koakademy-module-online-resources"
+        },
+        {
             "repository": "https://github.com/yukazakiri/koakademy-module-student-medical-records"
         }
     ]
