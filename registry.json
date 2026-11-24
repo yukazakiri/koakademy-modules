@@ -1,6 +1,6 @@
 {
     "schema": 1,
-    "generated_at": "2026-11-24T06:22:20Z",
+    "generated_at": "2026-11-24T23:50:57Z",
     "modules": [
         {
             "name": "Announcement",
@@ -454,7 +454,7 @@
             "name": "LibrarySystem",
             "alias": "library-system",
             "composer_package": "koakademy/library-system",
-            "version": "1.2.0",
+            "version": "1.5.0",
             "description": "Library catalogue, borrowing, research papers, and rights-cleared digital editions.",
             "author": "KoAkademy contributors",
             "license": "AGPL-3.0-or-later",
@@ -473,6 +473,17 @@
             "repository": "https://github.com/yukazakiri/koakademy-module-library-system",
             "homepage": "https://github.com/yukazakiri/koakademy-module-library-system",
             "versions": [
+                {
+                    "version": "1.5.0",
+                    "asset_url": "https://github.com/yukazakiri/koakademy-module-library-system/archive/8bce013a159d95879b6aa40a218edd67eae7e669.zip",
+                    "sha256": "e6fecc6a4aa681f0e77c7a93f65b8aeca23547faae9f1b82637f525bb2321ffd",
+                    "released_at": "2026-11-24T09:12:05Z",
+                    "requires": {
+                        "core": ">=1.29.0",
+                        "php": ">=8.5.12 <8.6"
+                    },
+                    "source_ref": "8bce013a159d95879b6aa40a218edd67eae7e669"
+                },
                 {
                     "version": "1.2.0",
                     "asset_url": "https://github.com/yukazakiri/koakademy-module-library-system/archive/d16cf1cf7645cb66cc49e497a23915fdb12b481d.zip",
@@ -566,7 +577,7 @@
             "name": "OnlineResources",
             "alias": "online-resources",
             "composer_package": "koakademy/online-resources",
-            "version": "1.0.0",
+            "version": "1.1.0",
             "description": "Categorized online resource directory with permanent QR codes, printable posters, school-wide hubs, and extensible class resource scopes.",
             "author": "KoAkademy contributors",
             "license": "AGPL-3.0-or-later",
@@ -585,6 +596,17 @@
             "repository": "https://github.com/yukazakiri/koakademy-module-online-resources",
             "homepage": "https://github.com/yukazakiri/koakademy-module-online-resources",
             "versions": [
+                {
+                    "version": "1.1.0",
+                    "asset_url": "https://github.com/yukazakiri/koakademy-module-online-resources/archive/5d47776182c4659316d36338dc44ac31d1c41442.zip",
+                    "sha256": "00705cc068b8391469350c6a4d7e887d933985de7c9db7ffeacbf4a4b6218b21",
+                    "released_at": "2026-11-24T23:50:25Z",
+                    "requires": {
+                        "core": ">=1.22.0",
+                        "php": ">=8.5 <8.6"
+                    },
+                    "source_ref": "5d47776182c4659316d36338dc44ac31d1c41442"
+                },
                 {
                     "version": "1.0.0",
                     "asset_url": "https://github.com/yukazakiri/koakademy-module-online-resources/archive/c37748d274bbaed8616d662b489b630f0fc52a32.zip",
@@ -660,9 +682,9 @@
             ]
         }
     ],
-    "packages_sha256": "5b897abc0a15777206d9204080d8422fb3dd1d74c80bbfe176cbc2fb1de902ae",
+    "packages_sha256": "e942d4e47f424fb3becda6c4c7bb1b41f4c09a4da18f691d2c78992e7a07a8c0",
     "signature": {
         "algorithm": "ed25519",
-        "value": "_rcwWqeQfLRnYsbV-UChko_UaTAgLhDf2gf1gAnnvYcPF_lAy0H1Xebsyq4GzpHLchmZiJRlM54-bpvL4dnhBg"
+        "value": "excnFg-_nmm8UHrAUoYIECxBX-fKXlg10nvjIy0_GV9ZWJ2OQsWUg7lOaI9I0DE5R9YAbaB6EH2vjSiXJOIFCQ"
     }
 }
