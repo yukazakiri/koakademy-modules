@@ -1,6 +1,6 @@
 {
     "schema": 1,
-    "generated_at": "2026-11-25T01:07:52Z",
+    "generated_at": "2026-11-25T03:14:24Z",
     "modules": [
         {
             "name": "Announcement",
@@ -577,7 +577,7 @@
             "name": "OnlineResources",
             "alias": "online-resources",
             "composer_package": "koakademy/online-resources",
-            "version": "1.2.0",
+            "version": "1.3.0",
             "description": "Categorized online resource directory with permanent QR codes, printable posters, school-wide hubs, and extensible class resource scopes.",
             "author": "KoAkademy contributors",
             "license": "AGPL-3.0-or-later",
@@ -596,6 +596,17 @@
             "repository": "https://github.com/yukazakiri/koakademy-module-online-resources",
             "homepage": "https://github.com/yukazakiri/koakademy-module-online-resources",
             "versions": [
+                {
+                    "version": "1.3.0",
+                    "asset_url": "https://github.com/yukazakiri/koakademy-module-online-resources/archive/f3a485a9af9db2ab9369a1d722f8c7ca62e41f72.zip",
+                    "sha256": "4c00dd18830c686c62232bac488bd2b6f3ddad34c86be19b2f170221e8a32d9b",
+                    "released_at": "2026-11-25T03:13:47Z",
+                    "requires": {
+                        "core": ">=1.22.0",
+                        "php": ">=8.5 <8.6"
+                    },
+                    "source_ref": "f3a485a9af9db2ab9369a1d722f8c7ca62e41f72"
+                },
                 {
                     "version": "1.2.0",
                     "asset_url": "https://github.com/yukazakiri/koakademy-module-online-resources/archive/f9cac2204b50db9c3d43ee1eefd94bdc476af50d.zip",
@@ -693,9 +704,9 @@
             ]
         }
     ],
-    "packages_sha256": "62f5571938f68243a9956ba39ba5f2876533330fc43c0d616cb9d13863058064",
+    "packages_sha256": "ca9e301337660c9ab0fe3e73be3281a1b9341ccc5b830b017b8c23ab1dad85e1",
     "signature": {
         "algorithm": "ed25519",
-        "value": "UkzXyqMDg6ZzU4cxbeQ5TZ-XUUPM9TmyT7PsbcRxSMycHnwn88bKvj14B2QuF2y2h0X4PafPsgl8-wep6SqxDA"
+        "value": "ucINJvLKdx1_HuawXQ1oDIGH9oF3Dm7JRDCjTGQWyAWI1lToWvZwMfXWgLc6Zxlk0rHB4VyzhiZM5XmpuGhIAg"
     }
 }
