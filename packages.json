@@ -1523,6 +1523,50 @@
             }
         },
         "koakademy/online-resources": {
+            "1.2.0": {
+                "name": "koakademy/online-resources",
+                "version": "1.2.0",
+                "type": "library",
+                "dist": {
+                    "type": "zip",
+                    "url": "https://github.com/yukazakiri/koakademy-module-online-resources/archive/f9cac2204b50db9c3d43ee1eefd94bdc476af50d.zip",
+                    "shasum": "87ce8578c745d1c676e8c476eb30ec26f4dcb851"
+                },
+                "source": {
+                    "type": "git",
+                    "url": "https://github.com/yukazakiri/koakademy-module-online-resources.git",
+                    "reference": "f9cac2204b50db9c3d43ee1eefd94bdc476af50d"
+                },
+                "require": {
+                    "php": ">=8.5 <8.6",
+                    "endroid/qr-code": "^6.0",
+                    "inertiajs/inertia-laravel": "^3.0",
+                    "laravel/framework": "^13.0",
+                    "nwidart/laravel-modules": "^13.0",
+                    "spatie/laravel-pdf": "^2.2"
+                },
+                "autoload": {
+                    "psr-4": {
+                        "Modules\\OnlineResources\\": "app/",
+                        "Modules\\OnlineResources\\Database\\Factories\\": "database/factories/",
+                        "Modules\\OnlineResources\\Database\\Seeders\\": "database/seeders/"
+                    }
+                },
+                "extra": {
+                    "laravel": {
+                        "providers": [
+                            "Modules\\OnlineResources\\Providers\\OnlineResourcesServiceProvider"
+                        ]
+                    }
+                },
+                "description": "Categorized online resources and permanent QR code quick-access hub for KoAkademy schools, classes, and student portals.",
+                "license": "AGPL-3.0-or-later",
+                "authors": [
+                    {
+                        "name": "KoAkademy contributors"
+                    }
+                ]
+            },
             "1.1.0": {
                 "name": "koakademy/online-resources",
                 "version": "1.1.0",
